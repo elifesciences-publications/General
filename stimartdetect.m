@@ -1,15 +1,43 @@
 
+
+
+function tStimArts = stimartdetect(varargin)
 % STIMARTDETECT
 % Outputs a vector of values corresponding to the times of occurence of
-% stimulus artifacts in inputted data.
+% stimulus pulses/artifacts in inputted data.
 %
-% tStimArts=stimartdetect(data,timeAxis)
-% 
+% tStimArts = stimartdetect(data,timeAxis);
+% tStimArts - A vector of times of occurrence of stimulus pulses/artifacts
+% data - Matrix of traces containing stimuli with time increasing along the
+%        row dimension
+% timeAxis - Time vec
+% tStimArts = stimartdetect(data,timeAxis,slopeThresh);
+% slopeThresh = Threshold for detecting slopes in units of std. For eg.,
+% a value of 3 implies detecting points with slopes greater than 3 times
+% the mean slopes (default = 3)
+% tStimArts = stimartdetect(data,timeAxis,slopeThres,ampThresh);
+% tStimArts = stimartdetect(data,timeAxis,[],ampThresh);
+% ampThresh = Amplitude threshold in units of std (default = 10)
 % Author: AP
 
-function tStimArts = stimartdetect(data,timeAxis)
+data = varargin{1};
+timeAxis = varargin{2};
+if nargin < 2
+    errordlg('STIMARTDETECT needs at least 2 inputs!')
+elseif nargin < 3
+    slopeThresh = 3;
+elseif nargin < 4
+    slopeThresh = varargin{3};
+else
+    slopeThresh = varargin{3};
+    if isempty(slopeThresh)
+        slopeThresh = 3;
+    end
+    ampThresh = varargin{4};
+end
 timeAxis = timeAxis - min(timeAxis); % This adj is necessary in case the starting time value is not zero.
 samplingInt = timeAxis(2) - timeAxis(1);
+
 
 %% Data Reshaping
 %%%% Assuming that there are more time points than signals, reshaping the
@@ -24,23 +52,29 @@ end
 datProd=abs(prod(chebfilt(data,samplingInt,50,'high'),2)); % To amplify the stimulus artifacts in relation to other noise 
 d2data=diff(datProd,2); % 2nd derivative gives the highest value for stimulus artifact onset
 d2data_abs = abs(d2data); 
-slopeThresh= 3*std(d2data_abs);
+slopeThresh= slopeThresh*std(d2data_abs);
 transients=find(d2data_abs >= slopeThresh);
 
 %% Amplitude threshold-based identification of artifact times
-figure('Name', 'Click on 2 locations along the time axis to expand traces')
-title('Detecting stimulus artifacts')
-plot(timeAxis,datProd)
-[x,y]=ginput(2);
-close
+if (nargin == 4) && ~isempty(varargin{4})
+    figure('Name', 'Click on 2 locations along the time axis to expand traces')
+    title('Detecting stimulus artifacts')
+    plot(timeAxis,datProd)
+    [x,y]=ginput(2);
+    close
+    
+    minPt = find(timeAxis>= min(x)); minPt = minPt(1);
+    maxPt = find(timeAxis>=max(x)); maxPt = maxPt(1);
+    figure('Name', '   Select an amplitude threshold')
+    plot(timeAxis,datProd)
+    axis([min(x) max(x) 0 30*std(datProd(minPt:maxPt))]), set(gca,'ytick',[])
+    ampThresh = ginput(1); ampThresh=ampThresh(2);
+    stimPeaks = find(abs(datProd)>=abs(ampThresh));
+else
+    stimPeaks = transients;
+end
 
-minPt = find(timeAxis>= min(x)); minPt = minPt(1);
-maxPt = find(timeAxis>=max(x)); maxPt = maxPt(1);
-figure('Name', '   Select an amplitude threshold')
-plot(timeAxis,datProd)
- axis([min(x) max(x) 0 30*std(datProd(minPt:maxPt))]), set(gca,'ytick',[])
-ampThresh = ginput(1); ampThresh=ampThresh(2);
-stimPeaks = find(abs(datProd)>=abs(ampThresh));
+
 close
 
 % answer= questdlg('How would you like to detect the first artifact?',...
