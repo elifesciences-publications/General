@@ -27,7 +27,7 @@ function tStimArts = stimartdetect(varargin)
 %   Interative choosing of amplitude threshold
 %
 %
-% tStimArts = stimartdetect(data,timeAxis,slopeThresh,ampThresh,'MINPEAKDISTANCE',minPeakDistance);
+% tStimArts = stimartdetect(data,timeAxis,slopeThresh,ampThresh,minPeakDistance);
 % tStimArts = stimartdetect(data,...,[]);
 %   minPeakDistance defaults to 200 microseconds
 %
@@ -85,18 +85,18 @@ elseif size(data,2) == size(data,1)
 end
 
 % datProd=abs(prod(chebfilt(data,samplingInt,50,'high'),2)); % To amplify the stimulus artifacts in relation to other noise 
-datProd=abs(prod(data,2));
-%% Slope-based identification of stimulus artifact times
+datProd = abs(prod(data,2));
+%% Slope-based identification of stimulus artifact onsets
 if (slopeThresh~=0)
 fprintf('\nSlope-based identification of stimuli...\n')
 d2data=diff(datProd,2); % 2nd derivative gives the highest value for stimulus artifact onset
-d2data_abs = abs(d2data); 
-slopeThresh= slopeThresh*std(d2data_abs);
-transients=find(d2data_abs >= slopeThresh);
+% d2data_abs = abs(d2data); 
+slopeThresh= mean(d2data) + slopeThresh*std(d2data);
+transients=find(d2data >= slopeThresh);
 else 
  transients  = [];
 end
-
+transients = transients + 1; % Because of 2nd derivative 
 
 %% Amplitude threshold-based identification of artifact times
 if (nargin > 3) && (strcmpi(ampThresh,'UI'))
@@ -104,7 +104,7 @@ fprintf('\nAmplitude-based identification of stimuli...\n')
     figure('Name', 'Click on 2 locations along the time axis to expand traces')
     title('Detecting stimulus artifacts')
     plot(timeAxis,datProd)
-    [x,y]=ginput(2);
+    [x,~]=ginput(2);
     close    
     minPt = find(timeAxis>= min(x)); minPt = minPt(1);
     maxPt = find(timeAxis>=max(x)); maxPt = maxPt(1);
@@ -112,12 +112,14 @@ fprintf('\nAmplitude-based identification of stimuli...\n')
     plot(timeAxis,datProd)
     axis([min(x) max(x) 0 30*std(datProd(minPt:maxPt))]), set(gca,'ytick',[])
     ampThresh = ginput(1); ampThresh=ampThresh(2);
-    stimPeaks = find(abs(datProd)>=abs(ampThresh)); 
+    stimPeaks = find(datProd >= ampThresh);
+%     stimPeaks = find(abs(datProd)>=abs(ampThresh)); 
     close
 elseif (nargin > 3) && ~(isempty(ampThresh))
 fprintf('\nAmplitude-based identification of stimuli...\n')
     ampThresh = mean(datProd) + ampThresh*std(datProd);
-    stimPeaks = find(abs(datProd)>=abs(ampThresh));
+    stimPeaks = find(datProd >= ampThresh);
+%     stimPeaks = find(abs(datProd)>=abs(ampThresh));
 else
     stimPeaks = transients;
 end
@@ -127,6 +129,7 @@ if isempty(transients) && (slopeThresh==0)
     transients = stimPeaks; % transients is used in the later part of the program
 end
 
+transients = union(transients(:), stimPeaks(:));
 
 % answer= questdlg('How would you like to detect the first artifact?',...
 %     'First artifact detection','Automatic','Manual','Automatic');
@@ -149,25 +152,42 @@ end
 if slopeThresh && ~isempty(ampThresh)
 fprintf('\nCross-validating...\n')
 end
-xPt = min(transients);
-transients(transients<xPt)=[];
-transients=[xPt; transients(:)];
+% xPt = min(transients);
+% % transients(transients<xPt)=[];
+% transients=[xPt; transients(:)];
 proxLimit=ceil(minPeakDistance/samplingInt); % 200 usec b/c this is usually the width of the stim pulse
-for k = 1:length(transients)
-    temp=stimPeaks-transients(k);
-    if(find(abs(temp)<=proxLimit))
-        transients(k)=transients(k);
-    else transients(k)=0;
-    end
-end
-transients(transients==0)=[];
-dTransients=diff(transients);
-badPts=find(dTransients<=proxLimit);
-transients(badPts(1:end))=[];
-testTransients=transients-6; % Since the stim artifact is very likely to get detected
-tStimArts= timeAxis(testTransients) + min(timeAxis);  % The timeShifter addition
-                                                     % is necessary in case
-                                                     % the starting time
+% for k = 1:length(transients)
+%     temp=stimPeaks-transients(k);
+%     if(find(abs(temp)<=proxLimit))
+%         transients(k)=transients(k);
+%     else transients(k)=0;
+%     end
+% end
 
+%% My old method of removing the latter of 2 consecutive transients separated by less than a min distance
+% transients(transients==0)=[];
+% dTransients = diff(transients);
+% badPts = find(dTransients <= proxLimit);
+% badPts(1)=[];
+% transients(badPts+1)=[];
+
+% testTransients=transients-6; 
+
+
+%% Nearest neighbor method of eliminating all transients
+fprintf('\nEliminating artifacts closer than minimum specified distance...\n')
+amps = ones(size(transients));
+[amps, transients] = RemovePeaksWithinRefractoryPeriod(amps, transients, proxLimit);
+
+% iDelete = ones(size(transients))<0;
+% for jj = 1:length(transients)
+%     if ~iDelete(jj)
+%         iDelete = iDelete |(transients <= transients(jj)+ proxLimit) & (transients >= transients(jj)-proxLimit);
+%         iDelete(jj) =0; % Don't remove current transient
+%     end
+% end
+% transients(iDelete) = [];
+
+tStimArts= timeAxis(transients) + min(timeAxis);  
 fprintf('\nDone!\n')
 
