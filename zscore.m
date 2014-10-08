@@ -46,4 +46,4 @@ sigma0 = sigma;
 sigma0(sigma0==0) = 1;
 z = bsxfun(@minus,x, mu);
 z = bsxfun(@rdivide, z, sigma0);
-display('Zscore Computed')
+
