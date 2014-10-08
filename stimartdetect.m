@@ -189,5 +189,5 @@ amps = ones(size(transients));
 % transients(iDelete) = [];
 
 tStimArts= timeAxis(transients) + min(timeAxis);  
-fprintf('\nDone!\n')
+
 
