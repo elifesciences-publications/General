@@ -29,14 +29,14 @@ function tStimArts = stimartdetect(varargin)
 %
 % tStimArts = stimartdetect(data,timeAxis,slopeThresh,ampThresh,minPeakDistance);
 % tStimArts = stimartdetect(data,...,[]);
-%   minPeakDistance defaults to 200 microseconds
+%   minPeakDistance defaults to 500 microseconds
 %
 % Author: AP
 
 %% Default Values
 defSlopeThresh = 3;
 defAmpThresh = []; % Indicates not using amplitude (ampThresh = 'UI' implies interative choosing of amplitude)
-defMinPeakDistance = 200e-6; % Typical duraction (sec) of stimulus pulse in our expts
+defMinPeakDistance = 500e-6; % Typical duraction (sec) of stimulus pulse in our expts
 
 data = varargin{1};
 timeAxis = varargin{2};
