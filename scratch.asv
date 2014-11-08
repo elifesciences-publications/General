@@ -12,13 +12,13 @@
 % episodicTime = ([startPts(kk):endPts(kk)]-startPts(kk))*samplingInt;
 % episodicTime = episodicTime-0.5; % So that stim onset corresponds to time = 0
 
-clear all, close all
+
 mfload
 
 out = concatenatesignals();
 conTime = out(:,1);
 conSignal = [out(:,2) out(:,5)];
-kernel = hamming(round(1e-3/samplingInts(1))); 
+kernel = hamming(round(2e-3/samplingInts(1))); 
 kernel = kernel/sum(kernel);
 blah = conv2(conSignal,kernel(:),'same');
 
