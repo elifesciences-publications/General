@@ -1,4 +1,4 @@
-function [pks,locs] = removePeaksSeparatedByLessThanRefractoryPeriod(pks,locs,Pd)
+function [pks,locs] = RemovePeaksWithinRefractoryPeriod(pks,locs,Pd)
 % Start with the larger peaks to make sure we don't accidentally keep a
 % small peak and remove a large peak in its neighborhood. 
 
