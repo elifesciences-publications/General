@@ -2,20 +2,19 @@
 % specified
 % ***** Author: AP *******
 
-% 
-% fileNames = {'T10624001'
-%     'T10624003'
-%     'T10624006'};
-% clear yrs
-% for nFile = 1:size(fileNames,1)
-%     if ~isempty(findstr('_',fileNames{nFile,:}))
-%         yrs(nFile,:) = [num2str(20) [fileNames{nFile}(4:5)]];
-%     else
-%         yrs(nFile,:) = [num2str(20) [fileNames{nFile}(2:3)]];
-%     end
-% end
-
-%%
+try
+    paths = FileNameToFullPath(fileNames{1},baseDir)
+    paths = [paths '\']
+    clear files
+    for nFile = 1:size(fileNames,1)
+        files(nFile) = {[fileNames{nFile}(2:end) '.abf']};
+    end
+%     files = fileNames';
+    nFiles = size(char(files),1);
+    [dataStruct,timeAxisStruct,samplingInts] = ...
+        createdatastructure(files,paths);
+catch
+   
 sid = getsid;
 if strcmpi(sid,'S-1-5-21-3197369867-541179473-1092110829')
 cd('C:\Users\Avi\Documents\All Things Research\Research Data\Data');    
@@ -25,4 +24,6 @@ end
 nFiles = size(char(files),1);
 [dataStruct,timeAxisStruct,samplingInts] = createdatastructure(files,paths);
 
-cd(paths(end,:)); 
+cd(paths(end,:));  
+    
+end
