@@ -1,9 +1,13 @@
 
-if exist('paths') & paths ~=0 & ~isempty(paths)
-    paths = paths;
-    cd(paths);
-    cd ..
-end
+
+fileNames = { 'T10624020'
+    'T10624022'
+    'T10624025'
+    'T10624030'
+    'T10625001'};
+
+baseDir = 'C:\Users\Avi\Documents\All Things Research\Research Data\Data';
+
 
 LoadMultipleFiles
 
@@ -14,3 +18,4 @@ xwplotmd
 ExtractAndNormalizeSignalPairStrength
 
 close all
+display(normalizedSignalPairXWPower)
