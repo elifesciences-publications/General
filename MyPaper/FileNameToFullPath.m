@@ -44,8 +44,11 @@ for nFolder = 1:size(folders,1)
         if strncmpi(currentFolder,yr,4)
         dirAdd = folders(nFolder,:);
         spaces = findstr(dirAdd, ' ');
+        if ~isempty(spaces)
        dirAdd(max(setdiff(find(dirAdd),spaces))+1:spaces(end)) = []; % Remove extra spaces at the end
-        fullDir = [baseDir '\' dirAdd];
+        end 
+       fullDir = [baseDir '\' dirAdd];
+        break;
     end
 end
 
@@ -57,8 +60,11 @@ for nFolder = 1:size(folders,1)
         if strncmpi(currentFolder,mo,3)
         dirAdd = folders(nFolder,:);
         spaces = findstr(dirAdd, ' ');
+        if ~isempty(spaces)
        dirAdd(max(setdiff(find(dirAdd),spaces))+1:spaces(end)) = []; % Remove extra spaces at the end
+        end
        fullDir = [fullDir '\' dirAdd];
+       break;
     end
 end
 
@@ -73,8 +79,11 @@ for nFolder = 1:size(folders,1)
         if findstr(blah,dy)
         dirAdd = folders(nFolder,:);
         spaces = findstr(dirAdd, ' ');
+        if ~isempty(spaces)
        dirAdd(max(setdiff(find(dirAdd),spaces))+1:spaces(end)) = []; % Remove extra spaces at the end
+        end
        fullDir = [fullDir '\' dirAdd];
+       break;
     end
 end
 
