@@ -1,10 +1,7 @@
+% clear all; close all;
 
-
-fileNames = { 'T10624020'
-    'T10624022'
-    'T10624025'
-    'T10624030'
-    'T10625001'};
+fileNames = {    'T09430025'
+    'T09430026'};
 
 baseDir = 'C:\Users\Avi\Documents\All Things Research\Research Data\Data';
 
@@ -17,5 +14,6 @@ xwplotmd
 
 ExtractAndNormalizeSignalPairStrength
 
-close all
-display(normalizedSignalPairXWPower)
+% close all
+display(normalizedSignalPairXWPower);
+num2clip(normalizedSignalPairXWPower);
