@@ -1,39 +1,20 @@
-% LOADFILES  Loads multiple data files into matlab workspace
-% LOADFILES loads data from selected .abf files into matlab workspace as a
-% data structure with field names set to the file names.
+% LoadFiles - Load multiple files at once into MATLAB workspace. One
+% limitation is that all the files must be in the same path or directory.
+% For loading files from different directories, migrate files to be loaded
+% to a common directory
 %
-% NB: The program calls the routine "ARTIFACTALIGN.m" which sets the time and
-% amplitude of each time trace at the occurrence of the first stimulus in
-% a train to zero.
-%
-% Author: AP
+% Author: Avinash Pujala
 
-%% Choosing the file to load
-answer='Yes';
-nFiles=0;
-while strcmpi(answer,'Yes');
-    nFiles = nFiles + 1;
-    if nFiles > 1
-        answer=questdlg('Would you like to analyze another file? ',...
-            'Choosing another file','Yes','No','No');
-        cd(path);
-    end
-    switch answer
-        case 'Yes'
-            loaddata;
-            f=strfind(file,'.');
-            file=file(1:f-1);
-            file=num2str(file);
-            file=['T' file];
-            [data,timeAxis]=artifactalign(data,timeAxis);
-            dataStruct.(file)= data;
-            timeAxisStruct.(file)= timeAxis;
-            %             [smooth,smoothTimeAxis]=smooth_adj(data,timeAxis);
-            %             smoothStruct.(file)= smooth;
-            %             smoothTimeAxisStruct.(file)= smoothTimeAxis;
-        case 'No'
-            fNames=fieldnames(dataStruct);
-    end
+baseDir = 'C:\Users\Avi\Documents\Research\ODonovan Lab\Data\Raw Data'; % Default location of data
+sid = getsid;
+if strcmpi(sid,'S-1-5-21-3197369867-541179473-1092110829')
+cd(baseDir);    
 end
-fNames_char = char(fNames);
-close all
+
+[files,paths] = uigetfile({'*.*';'*.abf';'*.atf';'*.mat';},'SELECT MULTIPLE FILES USING CTRL OR SHIFT KEY','Multiselect','on');
+nFiles = size(char(files),1);
+
+fprintf('\n Creating data structure from loaded files \n')
+[dataStruct,timeAxisStruct,samplingInts] = CreateDataStructure(files,paths);
+
+cd(paths(end,:)); % Change path to most recent directory 

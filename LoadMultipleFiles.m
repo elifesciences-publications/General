@@ -1,4 +1,4 @@
-% LoadMultipleFiles - Function version of MFLOAD where filenames can
+% LoadMultipleFiles - Version of MFLOAD where filenames can
 % specified
 % ***** Author: AP *******
 
