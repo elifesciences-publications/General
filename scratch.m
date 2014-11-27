@@ -1,10 +1,10 @@
-function out = AllStepSizesToOne(in)
-% Anytime in(x+1)~=in(x), set in(x+1) = in(x)+1 until next step
-
-out = in;
-f = find(in(2:end)~=in(1:end-1));
-out(1:f(1)) = 1;
-for jj = 1:numel(f)-1
-    out(f(jj)+1:f(jj+1)) = out(f(jj)) + 1; 
+nConditions = numel(unique(stimAmp(1,:))) * numel(unique(stimAmp(2,:)));
+stim1Conditions = unique(stimAmp(1,:));
+stim2Conditions = unique(stimAmp(2,:));
+trialMat = cell(numel(stim1Conditions),numel(stim2Conditions));
+for one = 1:numel(stim1Conditions);
+       for two = 1:numel(stim2Conditions)
+       trialInds = find(stimAmp(1,:)==stim1Conditions(one) &  stimAmp(2,:) == stimConditions(two));
+       trialMat{one,two} = trialSegmentedData(trialInds); 
+       end
 end
-out(f(end)+1:end) = out(f(end)); 
