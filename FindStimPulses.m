@@ -1,6 +1,4 @@
 
-
-
 function stimInds = FindStimPulses(varargin)
 % FindStimPulses - Returns the indices of stimulus pulses/artifacts in a
 % time series
@@ -8,22 +6,22 @@ function stimInds = FindStimPulses(varargin)
 % signals - Matrix of traces containing stimuli with time increasing along the
 %        row dimension
 %
-% tStimArts = FindStimPulses(signals);
+% stimInds = FindStimPulses(signals);
 % slopeThresh = Threshold for detecting slopes in units of std. For eg.,
 % a value of 3 implies detecting points with slopes greater than 3 times
 % the mean slopes (default = 3)
 %
 %
-% tStimArts = stimartdetect(data,timeAxis,slopeThresh,ampThresh);
+% stimInds = stimartdetect(data,timeAxis,slopeThresh,ampThresh);
 % ampThresh = Amplitude threshold in units of std (default = 20)
-% tStimArts = stimartdetect(data,timeAxis,[],ampThresh);
+% stimInds = stimartdetect(data,timeAxis,[],ampThresh);
 %   Detects stimuli based on amplitude only
-% tStimArts = stimartdetect(data,timeAxis,..,[])
+% stimInds = stimartdetect(data,timeAxis,..,[])
 %   Interative choosing of amplitude threshold
 %
 %
-% tStimArts = stimartdetect(data,timeAxis,slopeThresh,ampThresh,minPeakDistance);
-% tStimArts = stimartdetect(data,...,[]);
+% stimInds = stimartdetect(data,timeAxis,slopeThresh,ampThresh,minPeakDistance);
+% stimInds = stimartdetect(data,...,[]);
 %   minPeakDistance defaults to 500 microseconds
 %
 % Author: AP
@@ -111,7 +109,7 @@ else
     stimPeaks = transients;
 end
 
-if isempty(transients) && (slopeThresh==0)
+if isempty(transients) & (slopeThresh==0)
     transients = stimPeaks; % transients is used in the later part of the program
 end
 
