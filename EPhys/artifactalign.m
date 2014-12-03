@@ -10,9 +10,8 @@ function [varargout] = artifactalign(data,timeAxis,varargin)
 %   [data_mod, timeAxis_mod,stimTimes]= artifactalign(data,timeAxis) also
 %   returns stimTimes, a vector of time values for all the stimuli in a
 %   stimulus train.
-%
-%   ***** Author: AP *****
-%   Last Modified: 14-Mar-2014 17:21:30
+% Author: AP
+
 
 %%  Detecting stimulus artifacts
 if isempty(varargin)
