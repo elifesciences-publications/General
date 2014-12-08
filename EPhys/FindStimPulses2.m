@@ -1,5 +1,5 @@
 
-function stimInds = FindStimPulses(varargin)
+function stimInds = FindStimPulses2(varargin)
 % FindStimPulses - Returns the indices of stimulus pulses/artifacts in a
 % time series
 % 
@@ -113,15 +113,22 @@ if isempty(transients) && (slopeThresh==0)
     transients = stimPeaks; % transients is used in the later part of the program
 end
 
-transients = union(transients(:), stimPeaks(:));
+
+stimIndBool =zeros(size(signals));
+stimIndBool((signals(1:end-1) < ampThresh) & (signals(2:end)>= ampThresh)) = 1;
+stimIndBool((signals(1:end-2) < ampThresh) & (signals(3:end)>= ampThresh)) = 1;
+stimInds = find(stimIndBool);
+
+
+
+% transients = union(transients(:), stimPeaks(:));
 
 
 
 %% Nearest neighbor method of eliminating all transients
 fprintf('\n Eliminating artifacts closer than minimum specified distance... \n')
-amps = ones(size(transients));
-[~, transients] = RemovePeaksWithinRefractoryPeriod(amps, transients, minPeakDistance);
+amps = ones(size(stimInds));
+[~, stimInds] = RemovePeaksWithinRefractoryPeriod(amps, stimInds, minPeakDistance);
 
-stimInds = transients; 
 
 

@@ -1,5 +1,5 @@
 
-function stimInds = FindStimPulses(varargin)
+function stimInds = FindStimPulses2(varargin)
 % FindStimPulses - Returns the indices of stimulus pulses/artifacts in a
 % time series
 % 
@@ -113,7 +113,15 @@ if isempty(transients) && (slopeThresh==0)
     transients = stimPeaks; % transients is used in the later part of the program
 end
 
-transients = union(transients(:), stimPeaks(:));
+
+stimIndBool =zeros(size(signals));
+stimIndBool((signals(1:end) < ampThresh) & s(ignals>= ampThresh)) = 1;
+stimIndBool((signals < ampThresh) & signals(3:end)>= ampThresh) = 1;
+transients = find(stimIndBool);
+
+
+
+% transients = union(transients(:), stimPeaks(:));
 
 
 

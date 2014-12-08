@@ -19,45 +19,40 @@ end
 
 preStimPts = round(preStimPeriod/samplingInt);
 postStimPts = round(postStimPeriod/samplingInt);
+alpha = 1; % The larger the value, the broader the gaussian kernel 
 
-% % ker = hamming(max(round(kerWid/samplingInt),3));
-% ker = ones(max(round(kerWid/samplingInt),3),1);
-% lenKer = round(kerWid/samplingInt);
-% ker = abs(linspace(-lenKer,lenKer,lenKer));
-% ker = max(ker)-ker;
-% ker = ker./sum(ker);
 artlessSignal = signal;
-noiseLevel = 1*std(artlessSignal,[],1);
+noiseLevel = 0.5*std(artlessSignal,[],1);
 for stim = 1:numel(stimInds)
     artifact =[];
     fpt = round(max(stimInds(stim)-preStimPts,1));
     lpt = round(min(stimInds(stim) + postStimPts, length(signal)));
     [~,sigMaxInd] = max(abs(signal(fpt:lpt,:)),[],1); 
-%     m = (signal(lpt,:)-signal(fpt,:))/(lpt-fpt);
-%     m = repmat(m,numel(fpt:lpt),1);
-%     b = signal(fpt,:);
-%     b = repmat(b,numel(fpt:lpt),1);
-%     b = zeros(size(b));
-%     x = fpt:lpt;
-%     x = repmat(x(:),1,size(signal,2));
-%     slopedLine = m.*x + b;
+
    noise = repmat(noiseLevel,numel(fpt:lpt),1);
    noise = noise.*randn(size(noise));
     artifact = signal(fpt:lpt,:);
-    lenArt = length(fpt:lpt);
-    kernel = gausswin(lenArt,2.5);
-    kernel2 = gausswin(3*lenArt,3*2.5); % Making kernel longer than signal to accommodate for circhift coming up
+    lenArt = length(fpt:lpt);    
+    kernel = gausswin(lenArt,alpha);
+    kernel2 = gausswin(3*lenArt,3*alpha); % Making kernel longer than signal to accommodate for circhift coming up
     [~, kerMaxInd] = max(kernel,[],1);     
     kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
     kernel2([1:lenArt 2*lenArt+1:end])=[]; % Taking the central segment of kernel2 that matches signal in length
-     kernel2 = kernel2/sum(kernel2);
-%     kernel = repmat(kernel(:),size(signal,2));
-    
-    kernel2 =  repmat(kernel2(:),size(signal,2));
-    artifact1 = arr 
-    artifact2 = artifact.*kernel2;
+     kernel2 = kernel2/max(kernel2);
+     kernel = kernel/max(kernel);
+ 
+    kernel2 =  repmat(kernel2(:),1,size(signal,2));
+    kernel =  repmat(kernel(:),1, size(signal,2));
+
+     artifact = (artifact.*kernel);
+     art1 = artifact;
     noise = noise.*kernel;
 %     artlessSignal(fpt:lpt,:) = signal(fpt:lpt,:)-artifact + slopedLine; % Same as setting artifact to zero
+      artlessSignal(fpt:lpt,:) = signal(fpt:lpt,:)-artifact; % + noise;
+       
+      artifact = artlessSignal(fpt:lpt,:).*kernel;
       artlessSignal(fpt:lpt,:) = signal(fpt:lpt,:)-artifact + noise;
+      
+      
 end
 
