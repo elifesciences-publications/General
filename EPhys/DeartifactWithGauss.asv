@@ -24,55 +24,43 @@ alpha = 2; % The larger the value, the broader the gaussian kernel
 artlessSignal = signal;
 noiseLevel = 0.5*std(artlessSignal,[],1);
 for stim = 1:numel(stimInds)
-    
-    %%%%%%%%% First iteration %%%%%%%%%%
     artifact =[];
     fpt = round(max(stimInds(stim)-preStimPts,1));
     lpt = round(min(stimInds(stim) + postStimPts, length(signal)));
     noise = repmat(noiseLevel,numel(fpt:lpt),1);
    noise = noise.*randn(size(noise));
     artifact = signal(fpt:lpt,:);
-%     figure, subplot(2,1,1), plot(artifact), hold on, xlim([-inf inf])
+    figure, subplot(2,1,1), plot(artifact), hold on, xlim([-inf inf])
     lenArt = length(fpt:lpt);    
     kernel = gausswin(lenArt,alpha);      
-%      kernel = (kernel-min(kernel))/(max(kernel)-min(kernel));    
-%      plot(kernel*max(artifact),'c')
-%     kernel =  repmat(kernel(:),1, size(signal,2));
-%      artifact = (artifact.*kernel);
-%     plot(artifact,'r:')
-% %     artlessSignal(fpt:lpt,:) = signal(fpt:lpt,:)-artifact + slopedLine; % Same as setting artifact to zero
-%       artlessSignal(fpt:lpt,:) = signal(fpt:lpt,:)-artifact; %+ noise;
-%       plot(artlessSignal(fpt:lpt,:),'k')
-      kernel2 = gausswin(3*lenArt,3*alpha); % Making kernel longer than signal to accommodate for circhift coming up
-      [~, kerMaxInd] = max(kernel,[],1);  
-     [~,sigMaxInd] = max(abs(artifact),[],1);
-    kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
-    kernel2([1:lenArt 2*lenArt+1:end])=[]; % Taking the central segment of kernel2 that matches signal in length
-    kernel2 = (kernel2-min(kernel2))/(max(kernel2)-min(kernel2)); 
-%     plot(kernel2*max(artifact),'c')
-    kernel2 =  repmat(kernel2(:),1,size(signal,2)); 
-     noise = noise.*kernel2;
+     kernel = (kernel-min(kernel))/(max(kernel)-min(kernel));    
+     plot(kernel*max(artifact),'c')
+    kernel =  repmat(kernel(:),1, size(signal,2));
      artifact = (artifact.*kernel);
-%      plot(artifact,'r:')
-      artlessSignal(fpt:lpt,:) = artlessSignal(fpt:lpt,:)-artifact; % + noise;
-%      plot(artlessSignal(fpt:lpt,:),'k'), 
+    plot(artifact,'r:')
+%     artlessSignal(fpt:lpt,:) = signal(fpt:lpt,:)-artifact + slopedLine; % Same as setting artifact to zero
+      artlessSignal(fpt:lpt,:) = signal(fpt:lpt,:)-artifact; %+ noise;
+      
      
- %%%%%%%%%%%%%%%% 2nd iteration %%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%% 2nd iteration - with circhifted kernel
       artifact = artlessSignal(fpt:lpt,:);
-%       subplot(2,1,2), plot(artifact), hold on, xlim([-inf inf])
+      subplot(2,1,2), plot(artifact), hold on, xlim([-inf inf])
       kernel2 = gausswin(3*lenArt,3*alpha); % Making kernel longer than signal to accommodate for circhift coming up
       [~, kerMaxInd] = max(kernel,[],1);  
      [~,sigMaxInd] = max(abs(artifact),[],1);
     kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
     kernel2([1:lenArt 2*lenArt+1:end])=[]; % Taking the central segment of kernel2 that matches signal in length
     kernel2 = (kernel2-min(kernel2))/(max(kernel2)-min(kernel2)); 
-%     plot(kernel2*max(artifact),'c')
+    plot(kernel2*max(artifact),'c')
     kernel2 =  repmat(kernel2(:),1,size(signal,2)); 
      noise = noise.*kernel2;
      artifact = (artifact.*kernel);
-%      plot(artifact,'r:')
+     plot(artifact/max(artifact,'r:')
       artlessSignal(fpt:lpt,:) = artlessSignal(fpt:lpt,:)-artifact + noise;
-%      plot(artlessSignal(fpt:lpt,:),'k'), 
-       
+     plot(artlessSignal(fpt:lpt,:)/max(artlessSignal(fpt:lpt,:)),'g'), 
+%       artifact = artlessSignal(fpt:lpt,:).*kernel;
+%       artlessSignal(fpt:lpt,:) = signal(fpt:lpt,:)-artifact + noise;
+      
+      
 end
 
