@@ -24,14 +24,13 @@ if any(stimIsolGain==0) % For the time being, only plotting for single sided sti
             sa_temp = ones(size(blah))*sa_short(jj);
             if cc ==1,
                 plot(sa_temp,blah,'b.')
-                 hold on
-                plot(sa_short(jj),freqMat_mat_short(jj),'bo')
             else
                 plot(sa_temp,blah,'r.')
-                hold on
-                plot(sa_short(jj),freqMat_mat_short(jj),'ro')
-            end         
-       end
+            end
+           hold on
+            plot(sa_short(jj),freqMat_mat_short(jj),'ko')
+            %         errorbar(sa_short(jj),freqMat_mat_short(jj),sfMat_short(jj),'r')
+        end
         plot(sa_short,freqMat_mat_short,'k')
         xlim([xLim2(1)-2 xLim2(2)+2]), ylim([-inf inf]), box off
         set(gca,'tickdir','out')
@@ -52,21 +51,22 @@ if any(stimIsolGain==0) % For the time being, only plotting for single sided sti
             sa_temp = ones(size(blah))*sa_short(jj);
              if cc ==1,
                 plot(sa_temp,blah,'b.')
-                hold on
-                 plot(sa_short(jj),onMat_mat_short(jj),'bo')
             else
                 plot(sa_temp,blah,'r.')
-                  hold on
-                 plot(sa_short(jj),onMat_mat_short(jj),'ro')
             end
-          legend('Raw data points', 'Mean values')
+            hold on
+            plot(sa_short(jj),onMat_mat_short(jj),'ro')
+            legend('Raw data points', 'Mean values')
             %         errorbar(sa_short(jj),onMat_mat_short(jj),soMat_short(jj),'r')
         end
         plot(sa_short,onMat_mat_short,'k')
         xlim([xLim2(1)-2 xLim2(2)+2]), ylim([-inf inf]), box off
         set(gca,'tickdir','out')
-        ylabel('Swim Onset (ms)')                
-    end       
+        ylabel('Swim Onset (ms)')
+        
+        
+    end   
+    
 end
 
 
