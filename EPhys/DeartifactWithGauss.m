@@ -52,7 +52,7 @@ for stim = 1:numel(stimInds)
 %     plot(kernel2*max(artifact),'c')
     kernel2 =  repmat(kernel2(:),1,size(signal,2)); 
      noise = noise.*kernel2;
-     artifact = (artifact.*kernel);
+     artifact = (artifact.*kernel2);
 %      plot(artifact,'r:')
       artlessSignal(fpt:lpt,:) = artlessSignal(fpt:lpt,:)-artifact; % + noise;
 %      plot(artlessSignal(fpt:lpt,:),'k'), 
@@ -69,7 +69,7 @@ for stim = 1:numel(stimInds)
 %     plot(kernel2*max(artifact),'c')
     kernel2 =  repmat(kernel2(:),1,size(signal,2)); 
      noise = noise.*kernel2;
-     artifact = (artifact.*kernel);
+     artifact = (artifact.*kernel2);
 %      plot(artifact,'r:')
       artlessSignal(fpt:lpt,:) = artlessSignal(fpt:lpt,:)-artifact + noise;
 %      plot(artlessSignal(fpt:lpt,:),'k'), 
