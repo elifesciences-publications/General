@@ -22,7 +22,7 @@ postStimPts = round(postStimPeriod/samplingInt);
 alpha = 2; % The larger the value, the broader the gaussian kernel 
 
 artlessSignal = signal;
-noiseLevel = 1*std(artlessSignal,[],1);
+noiseLevel = 0.05*std(artlessSignal,[],1);
 
 for stim = 1:numel(stimInds)
     %%%%%%%%% First iteration %%%%%%%%%%

@@ -12,7 +12,7 @@ function stimInds = FindStimPulses2(varargin)
 % the mean slopes (default = 3)
 %
 %
-% stimInds = stimartdetect(data,timeAxis,slopeThresh,ampThresh);
+% stimInds = FindStimPulses2(data,slopeThresh,ampThresh, minPeakDistance);
 % ampThresh = Amplitude threshold in units of std (default = 20)
 % stimInds = stimartdetect(data,timeAxis,[],ampThresh);
 %   Detects stimuli based on amplitude only
@@ -20,9 +20,9 @@ function stimInds = FindStimPulses2(varargin)
 %   Interative choosing of amplitude threshold
 %
 %
-% stimInds = stimartdetect(data,timeAxis,slopeThresh,ampThresh,minPeakDistance);
-% stimInds = stimartdetect(data,...,[]);
-%   minPeakDistance defaults to 500 microseconds
+% stimInds = FindStimPulses2(data,timeAxis,slopeThresh,ampThresh,minPeakDistance);
+% stimInds = FindstimPulses2(data,...,[]);
+%   minPeakDistance defaults to 1ms
 %
 % Author: AP
 
