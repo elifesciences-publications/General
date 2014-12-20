@@ -1,107 +1,33 @@
-%% Plotting VR responses for all intensity unilateral stimulation trials
-fprintf('\n Plotting unilateral stimulation trials \n')
-sc = stimChannel;
-sc(stimIsolGain==0)=[];
+%% Smoothing and segmenting data by trials
 
-for side = sc(:)'
+artlessSignal = zeros(size(dataChannels));
+smSignal = artlessSignal;
+for cn = 1:numel(ePhysChannelToAnalyze); 
+     artlessSignal(cn,:) = DeartifactWithGauss(dataChannels(cn,:),samplingInt,artInds,20e-3,20e-3); % 45e-3 seems to work best!
+    artlessSignal(cn,:) = DeartifactWithGaussInterp(artlessSignal(cn,:),samplingInt,artInds,20e-3,20e-3); % 45e-3 seems to work best!
     
-    %%%%%%% Raw traces
-    figure('Name',['Stim ' num2str(side) ' only'])
-    stimConditions = [unilateralStimAmps{side}];
-    stimConditions_unique = unique(stimConditions);
-    blah ={};
-    for sc = 1:numel(stimConditions_unique)
-        inds = find(stimConditions == stimConditions_unique(sc));
-        subplot(numel(stimConditions_unique),1,sc)
-        blah = trialSegmentedData(unilateralStimTrialNums{side});
-        for ci = inds(:)'
-            thisSig = blah{ci};
-            for thisChan = 1:size(thisSig,2)
-                if thisChan < 2                
-                 plot(segmentTime*1000, thisSig(:,thisChan));
-                 hold on
-                else
-                   plot(segmentTime*1000, thisSig(:,thisChan),'r');
-                 end
-            end          
-            xlim(xLim)
-            ylim(yLim)
-            title(['Stim Amp: ' num2str(stimConditions_unique(sc))])
-            box off
-            if sc < numel(stimConditions_unique)
-                set(gca,'xtick',[],'ytick',[]);
-            end
-        end
-        set(gca,'tickdir','out')
-    end
-    xlabel('Time (ms)')
-    
-    %%%%% Smoothed traces
-    figure('Name',['Stim ' num2str(side) ' only'])
-    blah ={};
-    for sc = 1:numel(stimConditions_unique)
-        inds = find(stimConditions == stimConditions_unique(sc));
-        subplot(numel(stimConditions_unique),1,sc)
-        blah = trialSegData_smooth(unilateralStimTrialNums{side});
-        for ci = inds(:)'
-             thisSig = blah{ci};
-             for thisChan = 1:size(thisSig,2)
-                if thisChan < 2                
-                 plot(segmentTime*1000, thisSig(:,thisChan));
-                 hold on
-                else
-                   plot(segmentTime*1000, thisSig(:,thisChan),'r');
-                 end
-            end       
-                    
-            xlim(xLim)
-            %         ylim(yLim)
-            ylim(yLim_smooth)
-            title(['Stim Amp: ' num2str(stimConditions_unique(sc))])
-            box off
-            if sc < numel(stimConditions_unique)
-                set(gca,'xtick',[],'ytick',[]);
-            end
-        end
-        set(gca,'tickdir','out')
-    end
-    xlabel('Time (ms)')
-    
-    %%%%% Burst Trains
-    figure('Name',['Stim ' num2str(side) ' only - Burst trains'])
-    blah ={};
-      for sc = 1:numel(stimConditions_unique)
-        inds = find(stimConditions == stimConditions_unique(sc));
-        subplot(numel(stimConditions_unique),1,sc)
-        blah = trialSegBurstTrain(unilateralStimTrialNums{side});
-        counter = 0;
-        trialOffset = 0;
-        for ci = inds(:)'
-            counter = counter+1;
-            trialOffset = trialOffset+1; % Leave a gap of 1 row between trials
-            thisSig = blah{ci};
-            thisSig(thisSig==0)=nan;            
-            for thisChan = 1:size(thisSig,2)
-                trainShift = (counter-1)*numel(ePhysChannelToAnalyze)+ thisChan + (trialOffset-1);                
-                if thisChan <2
-                     plot(segmentTime*1000, thisSig(:,thisChan)+trainShift,'b.','markersize',5);
-                    hold on                   
-                else
-                    plot(segmentTime*1000, thisSig(:,thisChan)+trainShift,'r.','markersize',5);
-                    hold on
-                end
-                if sc < numel(stimConditions_unique)
-                    set(gca,'xtick',[]);
-                end
-                set(gca,'yTick',[])
-                xlim(xLim)
-                ylim([0 trainShift+2])
-                title(['Stim Amp: ' num2str(stimConditions_unique(sc))])
-                box off
-                set(gca,'tickdir','out')
-            end
-        end
-    end
-    ylabel('Trial Num')
-    xlabel('Time (ms)')
-end
+    artlessSignal(cn,:) = chebfilt(artlessSignal(cn,:),samplingInt,[hpFilt 1000]); 
+    blah = artlessSignal(cn,:);
+    threshLevel = mean(blah) + 10*std(blah);
+    blah(blah > threshLevel)= threshLevel;
+    blah(blah < -threshLevel) = -threshLevel; % Saturating at value of 10
+    artlessSignal(cn,:) = blah;
+    smSignal(cn,:) = SmoothVRSignals(artlessSignal(cn,:),samplingInt,hpFilt,lpFilt);
+    smSignal(cn,:) = DeartifactWithGaussInterp(smSignal(cn,:),samplingInt,stimInds,20e-3,30e-3);
+    blah = smSignal(cn,:);
+    threshLevel = mean(blah) + 50*std(blah);
+     blah(blah > threshLevel)= threshLevel;
+    blah(blah < -threshLevel) = -threshLevel; % Saturating at value of 10
+   smSignal(cn,:) = chebfilt(blah,samplingInt,1,'high');
+  end
+smSignal = smSignal';
+preStimPts  = round(preStimPeriod*samplingRate);
+postStimPts = round(postStimPeriod*samplingRate);
+
+fprintf('\n Deartifacting & smoothing signals \n')
+
+% artlessSignal = BlankArtifact(artlessSignal,samplingInt,stimInds,5e-3, 10e-3);
+% 
+% smSignal = SmoothVRSignals(artlessSignal,samplingInt,hpFilt,lpFilt);
+
+% smDiffSignal= SmoothDiffVRSignals(artlessSignal,samplingInt,hpFilt,lpFilt);
