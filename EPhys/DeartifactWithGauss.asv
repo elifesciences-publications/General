@@ -87,8 +87,8 @@ for stim = 1:numel(stimInds)
     
       artifact = artlessSignal(fpt:lpt,:);
 % %       subplot(2,1,2), plot(artifact), hold on, xlim([-inf inf])
-     
-     kernel2 = gausswin(3*lenArt,4.5*alpha); % In second iteration, reducing the width of the Gaussian
+      lenArt
+      kernel2 = gausswin(3*lenArt,3*alpha); % Making kernel longer than signal to accommodate for circhift coming up
       [~, kerMaxInd] = max(kernel,[],1);  
      [~,sigMaxInd] = max(abs(artifact),[],1);
     kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
