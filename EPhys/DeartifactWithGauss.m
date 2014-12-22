@@ -1,17 +1,19 @@
 
 
-function artlessSignal = DeartifactWithGauss(signal,samplingInt, stimInds,preStimPeriod, postStimPeriod)
+function artlessSignal = DeartifactWithGauss(signal,samplingInt, stimInds,preStimPeriod, postStimPeriod, alpha)
 
 % DeartifactWithGauss - Remove stimulus artifacts. In contrast to
 %                      Deartifact, subtracts Gaussian-modulated artifact for selected time
 %                       period and also adds some Hamming modulated noise
-%   data_mod = DeartifactWithGauss(data,samplingInt,stimIndices,preStimPeriod, postStimPeriod); 
+%   data_mod = DeartifactWithGauss(data,samplingInt,stimIndices,preStimPeriod, postStimPeriod, alpha); 
 %   data - signal vector
 %   timeAxis - time vector
 %   preStimPeriod - time period before stimulus in which artifact is
 %                   considered to have influence (due to filtering, etc)
 %   postStimPeriod - time period after stimulus in which artifact is
 %                     considered to have influence
+%   alpha - Gaussian shape parameter, larger values produce narrower
+%            gaussian
  
 if size(signal,1) < size(signal,2)
     signal = signal';
@@ -19,7 +21,6 @@ end
 
 preStimPts = round(preStimPeriod/samplingInt);
 postStimPts = round(postStimPeriod/samplingInt);
-alpha = 2; % The larger the value, the broader the gaussian kernel 
 
 artlessSignal = signal;
 noiseLevel = 0.05*std(artlessSignal,[],1);
