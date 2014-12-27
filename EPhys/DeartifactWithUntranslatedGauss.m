@@ -1,6 +1,6 @@
 
 
-function artlessSignal = DeartifactWithUntranslatedGauss(signal,samplingInt, stimInds,preStimPeriod, postStimPeriod)
+function artlessSignal = DeartifactWithUntranslatedGauss(signal,samplingInt, stimInds,preStimPeriod, postStimPeriod, alpha)
 
 % DeartifactWithUntranslatedGauss - Remove stimulus artifacts. In contrast to
 %                      Deartifact, subtracts Gaussian-modulated artifact for selected time
@@ -19,8 +19,8 @@ end
 
 preStimPts = round(preStimPeriod/samplingInt);
 postStimPts = round(postStimPeriod/samplingInt);
-alpha = 2; % The larger the value, the broader the gaussian kernel 
-
+% alpha = 2; % The larger the value, the broader the gaussian kernel 
+% 
 artlessSignal = signal;
 noiseLevel = 0.1*std(artlessSignal,[],1);
 

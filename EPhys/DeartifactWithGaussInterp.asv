@@ -61,10 +61,10 @@ while jj < length(dtVec)
     else
         firstInd = jj-halfSegInd;        
     end
-    if firstInd <= 0
+    if firstInd < 0
         firstInd = jj;
     end
-     excess_left =  halfSegInd -jj;
+     excess_left =  halfSegInd -;
     if excess_left > 0
         lastInd =  jj  + halfSegInd + excess_left;
     else
@@ -75,20 +75,21 @@ while jj < length(dtVec)
     end
     middleInd = round(median([firstInd lastInd]));
     time_sub = [firstInd middleInd lastInd];
-%      disp(time_sub)
-%     disp(['Range = ' num2str(time_sub(end)-time_sub(1))])
     art_sub = artifact(time_sub);
     time = firstInd:lastInd;
     art_interp(firstInd:lastInd) = interp1(time_sub, art_sub, time);
-    jj = jj+ ceil(0.8*halfSegInd);    
-%     disp(time_sub)
-%     disp(['Range = ' num2str(time_sub(end)-time_sub(1))])
-%     pause()
+    jj = jj+1;    
+    disp(time_sub)
+    disp(['Range = ' num2str(time_sub(end)-time_sub(1))])
+    pause()
 end
 
  artlessSignal(fpt:lpt,:) = artifact-art_interp(:); % + noise; 
      
-   
+%       if stim ==10
+%         pause(0.1);
+%     end
+     
      
 %      bb = unique(round(cumsum(dtVec)));
 %      

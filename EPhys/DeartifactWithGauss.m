@@ -77,31 +77,25 @@ for stim = 1:numel(stimInds)
 %      plot(artlessSignal(fpt:lpt,:),'k'), 
      
  %%%%%%%%%%%%%%%% 2nd iteration %%%%%%%%%%%%%%%%%%
-%   postStimPts = round(postStimPts/2); 
-%     fpt = round(max(stimInds(stim)-preStimPts,1));
-%     lpt = round(min(stimInds(stim) + postStimPts, length(signal)));
-%     lenArt = length(fpt:lpt);    
-%     kernel = gausswin(lenArt,alpha);   
-%       kernel2 = gausswin(3*lenArt,3*alpha); % Making kernel longer than signal to accommodate for circhift coming up
+
+    
+%       artifact = artlessSignal(fpt:lpt,:);
+%       artifact = chebfilt(artifact,samplingInt,100,'high');
+% 
+%      
+%      kernel2 = gausswin(3*lenArt,4.5*alpha); % In second iteration, reducing the width of the Gaussian
 %       [~, kerMaxInd] = max(kernel,[],1);  
 %      [~,sigMaxInd] = max(abs(artifact),[],1);
-    
-      artifact = artlessSignal(fpt:lpt,:);
-% %       subplot(2,1,2), plot(artifact), hold on, xlim([-inf inf])
-     
-     kernel2 = gausswin(3*lenArt,4.5*alpha); % In second iteration, reducing the width of the Gaussian
-      [~, kerMaxInd] = max(kernel,[],1);  
-     [~,sigMaxInd] = max(abs(artifact),[],1);
-    kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
-    kernel2([1:lenArt 2*lenArt+1:end])=[]; % Taking the central segment of kernel2 that matches signal in length
-    kernel2 = (kernel2-min(kernel2))/(max(kernel2)-min(kernel2)); 
-% %     plot(kernel2*max(artifact),'c')
-    kernel2 =  repmat(kernel2(:),1,size(signal,2)); 
-     noise = noise.*kernel2;
-     artifact = (artifact.*kernel2);
-% %      plot(artifact,'r:')
-      artlessSignal(fpt:lpt,:) = artlessSignal(fpt:lpt,:)-artifact + noise;
-%      plot(artlessSignal(fpt:lpt,:),'k'), 
-       
+%     kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
+%     kernel2([1:lenArt 2*lenArt+1:end])=[]; % Taking the central segment of kernel2 that matches signal in length
+%     kernel2 = (kernel2-min(kernel2))/(max(kernel2)-min(kernel2)); 
+% % %     plot(kernel2*max(artifact),'c')
+%     kernel2 =  repmat(kernel2(:),1,size(signal,2)); 
+%      noise = noise.*kernel2;
+%      artifact = (artifact.*kernel2);
+% % %      plot(artifact,'r:')
+%       artlessSignal(fpt:lpt,:) = artlessSignal(fpt:lpt,:)-artifact + noise;
+% %      plot(artlessSignal(fpt:lpt,:),'k'), 
+%        
 end
 
