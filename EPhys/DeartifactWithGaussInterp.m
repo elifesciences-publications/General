@@ -51,9 +51,6 @@ for stim = 1:numel(stimInds)
      art_interp = zeros(size(artifact));
      jj = 1;     
 while jj < length(dtVec)
-%     if jj ==176
-%         pause(0.1)
-%     end
     halfSegInd = max(round(dtVec(jj)/2),1);   
     excess_right = jj + halfSegInd - length(artifact);
     if excess_right > 0
@@ -81,12 +78,9 @@ while jj < length(dtVec)
     time = firstInd:lastInd;
     art_interp(firstInd:lastInd) = interp1(time_sub, art_sub, time);
     jj = jj+ ceil(0.8*halfSegInd);    
-%     disp(time_sub)
-%     disp(['Range = ' num2str(time_sub(end)-time_sub(1))])
-%     pause()
 end
 
- artlessSignal(fpt:lpt,:) = artifact-art_interp(:); % + noise; 
+ artlessSignal(fpt:lpt,:) = artifact-art_interp(:) + noise; 
      
    
      
