@@ -21,7 +21,7 @@ postStimPts = round(postStimPeriod/samplingInt);
 % alpha = 2; % The larger the value, the broader the gaussian kernel 
 
 artlessSignal = signal;
-noiseLevel = 0.05*std(artlessSignal,[],1);
+noiseLevel = 0.1*std(artlessSignal,[],1);
 
 for stim = 1:numel(stimInds)
     %%%%%%%%% First iteration %%%%%%%%%%
@@ -79,7 +79,7 @@ while jj < length(dtVec)
     art_interp(firstInd:lastInd) = interp1(time_sub, art_sub, time);
     jj = jj+ ceil(0.8*halfSegInd);    
 end
-
+noise = noise.*kernel2;
  artlessSignal(fpt:lpt,:) = artifact-art_interp(:) + noise; 
      
    

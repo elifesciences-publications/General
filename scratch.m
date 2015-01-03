@@ -1,19 +1,32 @@
-
-art_sub = zeros(size(artifact));
-for jj = 1:length(dtVec)
-    halfSegInd = round(dtVec(jj)/2);
-    lpt = min(jj + halfSegInd, length(artifact)); % Do not exceed length of artifact
-    excess = jj + halfSegInd - length(artifact);
-    if excess > 0
-        fpt = max((jj - excess - halfSegInd),1);
-    else
-        fpt = max(jj-halfSegInd,1);
+%% Plotting responses at different times to check for stationarity
+tfl = 1;
+if any(stimIsolGain == 0)
+    figName = ['Response Stationarity for ' num2str(sa(end-tfl)) 'V stim'];
+    figure('Name',figName)
+    blah = trialMat{end-tfl};
+    sigma = std(cell2mat(blah));
+    blah_sm = trialMat_smooth{end-tfl};
+    sigma_sm = std(cell2mat(blah_sm));
+    for trial = 1:length(blah)
+        subaxis(length(blah),1,trial,'MR',0.05, 'ML', 0.05,'MT', 0.05)
+        for chan  = 1:numel(ePhysChannelToAnalyze)
+            if chan > 1
+                col = 'r';
+            else
+                col = 'b';
+            end
+            plot(segmentTime*1000, blah{trial}(:,chan)./sigma(chan) - (chan-1)*10, 'k')
+            hold on
+            plot(segmentTime*1000, blah_sm{trial}(:,chan)./sigma_sm(chan) - (chan-1)*10, col,'linewidth',2)
+        end
+        xlim(xLim), ylim([-20 40]), box off
+        set(gca,'tickdir','out')
+        if trial ~= length(blah)
+            set(gca,'xtick',[], 'ytick',[])
+        else
+            xlabel('Time (ms)')
+        end
     end
-    mpt = median([fpt lpt]);
-    time_sub = [fpt mpt lpt];
-    art_sub = artifact(time_sub);
-    time = fpt:lpt;
-    cc(fpt:lpt) = interp1(time_sub, art_sub, time);
 end
 
 
@@ -30,10 +43,8 @@ end
 
 
 
-
-
-% 
-%     
+%
+%
 %     %%%%% Burst Trains - Alternative procedure...
 %     figure('Name',['Stim ' num2str(side) ' only - Burst trains'])
 %      interTrialGap = 1; % # of blank rows to insert between trials (Cannot be a fraction!)
@@ -45,7 +56,7 @@ end
 %        counter = 0;
 %         for trialNum = 1:numel(ePhysChannelToAnalyze)+interTrialGap:size(tempMat,1)
 %             counter = counter+1;
-%             tempMat(trialNum:(trialNum-1)+numel(ePhysChannelToAnalyze)+interTrialGap,:) = [theseTrials{counter}'; zeros(1,length(theseTrials{1}))];                                 
+%             tempMat(trialNum:(trialNum-1)+numel(ePhysChannelToAnalyze)+interTrialGap,:) = [theseTrials{counter}'; zeros(1,length(theseTrials{1}))];
 %             % Raster plotting bursts
 %             blah =  tempMat(trialNum:(trialNum-1)+numel(ePhysChannelToAnalyze)+interTrialGap,:);
 %             blah(blah==0)=nan;
@@ -58,9 +69,9 @@ end
 % %                  plot(segmentTime*1000, blah(jj,:)-trainShift,'r.')
 % %                  hold on
 %               end
-%             end 
+%             end
 %            box off, xlim([-50 750]), ylim([-inf inf])
-%             if sc == size(burstTrainMat,dim)              
+%             if sc == size(burstTrainMat,dim)
 %                  set(gca,'tickdir','out','ytick',[])
 %                  xlabel('Time (ms)')
 %                  ylabel('Trial Num')
@@ -68,8 +79,8 @@ end
 %                  set(gca,'tickdir','out','ytick',[],'xtick',[])
 %             end
 %         end
-%              
+%
 %     end
-% %     
-%     
+% %
+%
 
