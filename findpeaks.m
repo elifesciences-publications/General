@@ -166,7 +166,8 @@ if ~isempty(idelete),
 end
 
 X(infIdx) = Inf;                 % Restore +Inf
-locs = union(locs,find(infIdx), 'rows'); % Make sure we find peaks like [realmax Inf realmax]
+% locs = union(locs,find(infIdx), 'rows'); % Make sure we find peaks like [realmax Inf realmax]
+locs = union(locs,find(infIdx));
 pks  = X(locs);
 
 %--------------------------------------------------------------------------
