@@ -67,7 +67,7 @@ elseif nargin < 4
     minPeakDistance = defMinPeakDistance;
 elseif (nargin ==5) & strcmpi(varargin{5},'exact')
     slopeThresh = varargin{2};
-    ampThresh = (varargin{3} - mu(1))/sig(1);   
+    ampThresh = (varargin{3} - mu)/sig;   
     minPeakDistance = varargin{4};
 else
     slopeThresh = varargin{2};
