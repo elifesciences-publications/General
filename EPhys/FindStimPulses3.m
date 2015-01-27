@@ -1,6 +1,6 @@
 
-function stimInds = FindStimPulses(varargin)
-% FindStimPulses - Returns the indices of stimulus pulses/artifacts in a
+function stimInds = FindStimPulses3(varargin)
+% FindStimPulses3 - Returns the indices of stimulus pulses/artifacts in a
 % time series
 % 
 % signals - Matrix of traces containing stimuli with time increasing along the
@@ -12,7 +12,7 @@ function stimInds = FindStimPulses(varargin)
 % the mean slopes (default = 3)
 %
 %
-% stimInds = FindStimPulses(signals,slopeThresh,ampThresh, minPeakDistance);
+% stimInds = FindStimPulses3(signals,slopeThresh,ampThresh, minPeakDistance);
 % slopeThresh - Threshold in units of std for detecting a slope.
 % ampThresh = Amplitude threshold in units of std (default = 20)
 % stimInds = stimartdetect(data,timeAxis,[],ampThresh);
@@ -34,7 +34,7 @@ defMinPeakDistance = 1e-3; % Typically, the stim pulse duraction does not exceed
 
 signals = varargin{1};
 if all(size(signals)>1)
-    errordlg('Signal input to FindStimPulses must be a vector'); % In future versions, I can implement matrix inputs
+    errordlg('Signal input to FindStimPulses3 must be a vector'); % In future versions, I can implement matrix inputs
 end
 
 %% Make sure that signals are arranged as columns
@@ -44,8 +44,8 @@ elseif size(signals,2) == size(signal,s1)
     warndlg('Make sure that the timeseries form columns of the input matrix')
 end
 tmp = sort(abs(signals),'ascend');
-mu =  mean(tmp(1:round(size(tmp,1)/20)));  % Matrix of means of columns using bottom 5% values
-sig = std(tmp(1:round(size(tmp,1)/20)));
+mu = repmat(mean(tmp(1:round(size(tmp,1)/20))),size(signals,1),1);  % Matrix of means of columns using bottom 5% values
+sig = repmat(std(tmp(1:round(size(tmp,1)/20))),size(signals,1),1);
 % signals = zscore(detrend(mean(signals,2))); % Assuming all signals have coincident stimulus pulses
 signals = (signals - mu)./sig; % Converts to zscores
 
@@ -67,7 +67,7 @@ elseif nargin < 4
     minPeakDistance = defMinPeakDistance;
 elseif (nargin ==5) & strcmpi(varargin{5},'exact')
     slopeThresh = varargin{2};
-    ampThresh = (varargin{3} - mu(1))/sig(1);   
+    ampThresh = (varargin{3} - mu)/sig;   
     minPeakDistance = varargin{4};
 else
     slopeThresh = varargin{2};
@@ -132,6 +132,7 @@ stimIndBool = zeros(size(signals));
 stimIndBool((signals(1:end-1) < ampThresh) & (signals(2:end)>= ampThresh)) = 1;
 stimIndBool((signals(1:end-2) < ampThresh) & (signals(3:end)>= ampThresh)) = 1;
 stimInds = find(stimIndBool);
+
 
 
 % transients = union(transients(:), stimPeaks(:));
