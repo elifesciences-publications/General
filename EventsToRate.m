@@ -15,6 +15,6 @@ end
 
 eventRate = zeros(size(1:sigLen));
 for jj = 1:numel(eventInds)-1
-    eventRate(eventInds(jj):eventInds(jj+1),side) = 1./((eventInds(jj+1)-eventInds(jj))*samplingInt);
+    eventRate(eventInds(jj):eventInds(jj+1)) = 1./((eventInds(jj+1)-eventInds(jj))*samplingInt);
 end
 
