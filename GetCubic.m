@@ -4,10 +4,9 @@ function varargout = GetCubic(x)
 %                    original signal
 % 
 % y = GetCubic(x);
-% [y,s] = GetCubic(x);
+% [y,s,pks_max,pks_min] = GetCubic(x);
 % Outputs:
 % s - mean of the interpolated maximal and minimal envelope
-
 
 pks_min = findpeaks_hht(-x);
 pks_max = findpeaks_hht(x);
@@ -19,5 +18,7 @@ y = x - (s1+s2)/2;
 
 varargout{1} = y;
 varargout{2} = (s1+s2)/2;
+varargout{3} = pks_max;
+varargout{4} = pks_min;
 end
 
