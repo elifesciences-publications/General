@@ -268,9 +268,9 @@ if h.fFileVersionNumber>=2
  % errors (AP - 09-Jul-2014 18:13:52)
  fseek(fid,StringsSection.uBlockIndex*BLOCKSIZE,'bof');
  BigString=fread(fid,StringsSection.uBytes,'char');
- this is a hack
+%  this is a hack
  goodstart=strfind(lower(char(BigString)'),'clampex');
- this extends the hack to deal with axoscope files 
+%  this extends the hack to deal with axoscope files 
  if isempty(goodstart)
       goodstart=strfind(lower(char(BigString)'),'axoscope');
   end
