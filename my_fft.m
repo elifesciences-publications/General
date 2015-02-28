@@ -13,7 +13,7 @@ h=hamming(length(x));
 h = repmat(h(:),[1 size(x,2) size(x,3)]);
 x=h.*x; % Time series multiplied by hamming function of equal length,
         % presumably to minimize edge effects.
-nfft=2^nextpow2(length(x)); % FFT faster if length of output vector is an
+nfft=2^nextpow2(length(x)); % FFT is faster if length of output vector is an
                             % power of 2.
 y=fft(x,nfft)/length(x); % Why normalize???
 f=0.5*Fs*linspace(0,1,nfft/2);
