@@ -37,7 +37,7 @@ for stim = 1:numel(stimInds)
       [~, kerMaxInd] = max(kernel,[],1);  
      [~,sigMaxInd] = max(abs(artifact),[],1);    
        
-     kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
+    kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
     kernel2([1:lenArt 2*lenArt+1:end])=[]; % Taking the central segment of kernel2 that matches signal in length
     kernel2 = kernel2-min(kernel2);
     kernel2 = kernel2*max(kernel2);
