@@ -37,7 +37,7 @@ for stim = 1:numel(stimInds)
       [~, kerMaxInd] = max(kernel,[],1);  
      [~,sigMaxInd] = max(abs(artifact),[],1);    
        
-     kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
+    kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
     kernel2([1:lenArt 2*lenArt+1:end])=[]; % Taking the central segment of kernel2 that matches signal in length
     kernel2 = kernel2-min(kernel2);
     kernel2 = kernel2*max(kernel2);
@@ -72,8 +72,7 @@ while jj < length(dtVec)
     end
     middleInd = round(median([firstInd lastInd]));
     time_sub = [firstInd middleInd lastInd];
-%      disp(time_sub)
-%     disp(['Range = ' num2str(time_sub(end)-time_sub(1))])
+
     art_sub = artifact(time_sub);
     time = firstInd:lastInd;
     art_interp(firstInd:lastInd) = interp1(time_sub, art_sub, time);
