@@ -43,11 +43,6 @@ if size(signals,2) >  size(signals,1)
 elseif size(signals,2) == size(signal,s1)
     warndlg('Make sure that the timeseries form columns of the input matrix')
 end
-tmp = sort(abs(signals),'ascend');
-mu =  mean(tmp(1:round(size(tmp,1)/20)));  % Matrix of means of columns using bottom 5% values
-sig = std(tmp(1:round(size(tmp,1)/20)));
-% signals = zscore(detrend(mean(signals,2))); % Assuming all signals have coincident stimulus pulses
-signals = (signals - mu)./sig; % Converts to zscores
 
 
 %%
@@ -85,6 +80,8 @@ if isempty(minPeakDistance)
     minPeakDistance = defMinPeakDistance;
 end
 
+[signals, mu, sig] = ZscoreByHist(signals);
+
 
 %% Slope-based identification of stimulus artifact onsets
 if (slopeThresh~=0)
@@ -113,12 +110,14 @@ fprintf('\n Amplitude-based identification of stimuli... \n')
     plot(time,signals)
     axis([min(x) max(x) 0 30*std(signals(minPt:maxPt))]), set(gca,'ytick',[])
     ampThresh = ginput(1); ampThresh=ampThresh(2);
-    stimPeaks = find(signals >= ampThresh);
+    [~,stimPeaks] = FindPeaksByLevel(signals,ampThresh);
+%     stimPeaks = findpeaks_hht(signals);
+%     stimPeaks = find(signals >= ampThresh);
 %     stimPeaks = find(abs(datProd)>=abs(ampThresh)); 
     close
 elseif (nargin > 3) && ~(isempty(ampThresh))
 fprintf('\n Amplitude-based identification of stimuli... \n')
-    stimPeaks = find(signals >= ampThresh);
+    [~,stimPeaks] = FindPeaksByLevel(signals, ampThresh);    
 else
     stimPeaks = transients;
 end
@@ -127,11 +126,12 @@ if isempty(transients) && (slopeThresh==0)
     transients = stimPeaks; % transients is used in the later part of the program
 end
 
+stimInds  = stimPeaks;
 
-stimIndBool = zeros(size(signals));
-stimIndBool((signals(1:end-1) < ampThresh) & (signals(2:end)>= ampThresh)) = 1;
-stimIndBool((signals(1:end-2) < ampThresh) & (signals(3:end)>= ampThresh)) = 1;
-stimInds = find(stimIndBool);
+% stimIndBool = zeros(size(signals));
+% stimIndBool((signals(1:end-1) < ampThresh) & (signals(2:end)>= ampThresh)) = 1;
+% stimIndBool((signals(1:end-2) < ampThresh) & (signals(3:end)>= ampThresh)) = 1;
+% stimInds = find(stimIndBool);
 
 
 % transients = union(transients(:), stimPeaks(:));
