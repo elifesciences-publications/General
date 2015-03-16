@@ -290,6 +290,7 @@ else
 end
 
 if h.fFileVersionNumber>=2
+<<<<<<< HEAD
   % -----------------------------------------------------------------------
   % *** read file information that has moved from the header section to
   % other sections in ABF version >= 2.0 and assign selected values to
@@ -324,6 +325,25 @@ if h.fFileVersionNumber>=2
   stringends=[0 stringends];
   for i=1:length(stringends)-1
     Strings{i}=char(BigString(stringends(i)+1:stringends(i+1)-1));
+=======
+ % --- read in the Sections
+ Sects=cell2struct(Sections,{'name'},2);
+ numOfSections=length(Sections);
+ offset=76;
+ for i=1:numOfSections
+   eval([Sects(i).name '=ReadSectionInfo(fid,offset);']);
+   offset=offset+4+4+8;
+ end
+ % --- read in the Strings - I commented out this section because of
+ % errors (AP - 09-Jul-2014 18:13:52)
+ fseek(fid,StringsSection.uBlockIndex*BLOCKSIZE,'bof');
+ BigString=fread(fid,StringsSection.uBytes,'char');
+%  this is a hack
+ goodstart=strfind(lower(char(BigString)'),'clampex');
+%  this extends the hack to deal with axoscope files 
+ if isempty(goodstart)
+      goodstart=strfind(lower(char(BigString)'),'axoscope');
+>>>>>>> d0986cf8b36d1615e63ae749bd8088360b4d98ab
   end
   h.recChNames=[];
   h.recChUnits=[];
