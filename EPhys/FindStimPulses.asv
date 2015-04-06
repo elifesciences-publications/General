@@ -82,18 +82,18 @@ if isempty(minPeakDistance)
     minPeakDistance = defMinPeakDistance;
 end
 
-if ~exactFlag
-[signals, ~, ~] = ZscoreByHist(signals);
-end
+if ~
+[signals, mu, sig] = ZscoreByHist(signals);
+
 
 %% Slope-based identification of stimulus artifact onsets
 if (slopeThresh~=0)
 fprintf('\nSlope-based identification of stimuli...\n')
 dSignals=diff(signals); 
 tmp = sort(abs(dSignals),'ascend');
-muSlope = repmat(mean(tmp(1:round(size(tmp,1)/20))),size(dSignals,1),1); % For bottom 5% values
-sigSlope = repmat(std(tmp(1:round(size(tmp,1)/20))),size(dSignals,1),1);
-dSignals = (dSignals-muSlope)./sigSlope; % Converts to z-scores
+mu = repmat(mean(tmp(1:round(size(tmp,1)/20))),size(dSignals,1),1); % For bottom 5% values
+sig = repmat(std(tmp(1:round(size(tmp,1)/20))),size(dSignals,1),1);
+dSignals = (dSignals-mu)./sig; % Converts to z-scores
 transients=find(dSignals >= slopeThresh);
 else 
  transients  = [];
