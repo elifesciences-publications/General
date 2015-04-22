@@ -1,12 +1,12 @@
 
 
 function artlessSignal = DeartifactWithGaussInterp2(signal,samplingInt,stimInds,preStimPeriod, postStimPeriod,alpha)
-
 % DeartifactWithGaussInterp2 - Remove stimulus artifacts by Gaussian sampling interpolation near the artifact.
 %                       period and also adds some Hamming modulated noise
-%   data_mod = DeartifactWithGaussInterp(data,samplingInt,stimIndices,preStimPeriod, postStimPeriod);
-%   data - signal vector
-%   timeAxis - time vector
+%   data_mod = DeartifactWithGaussInterp2(data,samplingInt,stimIndices,preStimPeriod, postStimPeriod);
+%   data        - timeseries with artifacts
+%   samplingInt - samplingInterval
+%   stimInds    - stimulus indices
 %   preStimPeriod - time period before stimulus in which artifact is
 %                   considered to have influence (due to filtering, etc)
 %   postStimPeriod - time period after stimulus in which artifact is
@@ -24,7 +24,7 @@ artlessSignal = signal;
 noiseLevel = 0.1*std(artlessSignal,[],1);
 
 for stim = 1:numel(stimInds)
-    %%%%%%%%% First iteration %%%%%%%%%%
+    %## 1st round: artifact estimation using local means of variable size windows
     disp(['Stim # ' num2str(stim)])
     artifact =[];
     fpt = round(max(stimInds(stim)-preStimPts,1));
@@ -40,6 +40,7 @@ for stim = 1:numel(stimInds)
 %   right despite the circshift.
     kernel2(badInd:end) = min(kernel2);
     kernel2 = (kernel2-min(kernel2))/max(kernel2);
+    
 %     kernel2 = gausswin(3*lenArt,3*alpha); % Making kernel longer than signal to accommodate for circhift coming up
 %     [~, kerMaxInd] = max(kernel,[],1);
 %     [~,sigMaxInd] = max(abs(artifact),[],1);
@@ -65,7 +66,7 @@ for stim = 1:numel(stimInds)
     end
     res.med = artifact - blah.med;    
     
-    %% 2nd round of artifact reduction with kernel that is half as wide
+    %## 2nd round: artifact reduction with half-width kernel
     kernel = gausswin(lenArt,2*alpha);
     kernel2 = circshift(kernel,round(lenArt/2)+preStimPts);
     badInd = find((kernel2(2:end) > min(kernel2)) & (kernel2(1:end-1) == min(kernel2)));
@@ -73,10 +74,7 @@ for stim = 1:numel(stimInds)
     kernel2 = (kernel2-min(kernel2))/max(kernel2);
     
     noise = noise.*kernel2;
-    artlessSignal(fpt:lpt,:) = (res.med.*(1-kernel2)) + noise;    
-    
-    
-
+    artlessSignal(fpt:lpt,:) = (res.med.*(1-kernel2)) + noise;  
     
 end
 
