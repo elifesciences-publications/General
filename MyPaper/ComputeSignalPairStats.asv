@@ -35,12 +35,7 @@ ylim([-inf inf]), xlim([-inf inf])
 [p,anovaTable, kwStats] = kruskalwallis(vals,groups);
 c = multcompare(kwStats);
 
-stats = struct;
-stats.groups = groups;
-stats.means = means;
-stats.sigmas = sigs;
-stats.anovaTable = anovaTable;
-stats.kwStats = kwStats;
+stats.means = means
 
 end
 
