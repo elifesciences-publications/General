@@ -1,6 +1,6 @@
 function varargout = CreateSubaxes(varargin)
-%CreateSubaxes Opens a figure window and returns the of subaxes created
-%              based on input info
+%CreateSubaxes Opens a figure window and returns the handles of subaxes created
+%   based on input info
 %
 % axHandles = CreateSubaxes(figHandle,axSpecs)
 % axHandles = CreateSubaxes(figHandle, axSpecs1, axSpecs2,...)
