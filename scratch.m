@@ -1,114 +1,62 @@
 
-function WriteLSVideo(aveResponseImg, baselineImg, dff5secImg, nRows, nCols, movName,output_dir)
-
-  %% Videowriter
-   stackDim = size(aveResponseImg);
-    currentPath = cd;
-    cd(output_dir)
-    monSize = getMonitorSize;
-   
-    figure('units','pixels','outerposition',[0 0 monSize(3)-0.1*monSize(3) monSize(4)-0.1*monSize(4)]);    
-    writerObj = VideoWriter(movName,'Uncompressed AVI');
-    writerObj.FrameRate = 5;
-    open(writerObj);    
-    for i = 1:size(aveResponseImg,4)
-        f1 = (aveResponseImg(:,:,:,i)./baselineImg)-1; 
-        gcf;
-        h = imagesc(reshape(permute(reshape(f1,[stackDim(1) stackDim(2) nRows nCols]), [1 4 2 3]), ...
-            [stackDim(1)*nCols, stackDim(2)*nRows]),[-0.2 0.5]);
-        
-        axis off;
-        axis image;
-        title(['frame no: ', int2str(i)]);
-        colorbar;
-        colormap gray;
-        set(gca,'Units','normalized','Position',[0.025 0.025 0.95 0.95]);
-        %     F(i) = getframe(gcf);
-        frame = getframe(gcf);
-        writeVideo(writerObj,frame);
-    end
-    
-    % movie(F,20);
-    close(writerObj);
-    
-     %% dff
-    fprintf('\n Creating dff stack \n')
-    dff = zeros(stackDim(1)*nCols, stackDim(2)*nRows,size(aveResponseImg,4));
-    for i = 1:size(aveResponseImg,4)
-        f1 = (aveResponseImg(:,:,:,i)./baselineImg)-1;
-        dff(:,:,i) = reshape(permute(reshape(f1,[stackDim(1) stackDim(2) nRows nCols]), [1 4 2 3]), [stackDim(1)*nCols, stackDim(2)*nRows]);
-    end
-    fh = fopen(['dff_' movName '.bin'],'w');
-    fwrite(fh, dff,'double');
-    fclose(fh);
-    fprintf('\n Done! \n')
-    
-    %% stflat
-    fprintf('\n Creating stflat stack \n')
-    stflat = zeros(stackDim(1)*nCols, stackDim(2)*nRows,size(aveResponseImg,4));
-    for i = 1:size(aveResponseImg,4)
-        stflat(:,:,i) = reshape(permute(reshape((baselineImg-min(baselineImg(:)))/max(baselineImg(:)),[stackDim(1) stackDim(2) nRows nCols]), [1 4 2 3]), [stackDim(1)*nCols, stackDim(2)*nRows]);
-    end
-    fh = fopen(['stflat_' movName '.bin'],'w');
-    fwrite(fh, stflat,'double');
-    fclose(fh);
-    fprintf('\n Done! \n')
-    
-    %%
-    dffPlus= zeros(stackDim);dffNegative = zeros(stackDim);
-    plusIndex = dff5secImg(:)>0.02;
-    negIndex = dff5secImg(:)<-0.02;
-    dffPlus(plusIndex) = dff5secImg(plusIndex);
-    dffNegative(negIndex) = -dff5secImg(negIndex);
-    
-    nor_dffPlus = dffPlus/0.5;
-    nor_dffNegative = dffNegative/0.5;
-    
-    figure('position', [0 0 1600*stackDim(2)/stackDim(1) 1600]);
-    imagesc(baselineImg(:,:,24));
-    axis image;
-    axis off;
-    set(gca,'Units','normalized', 'Position', [0 0 1 1]);
-    
-    movName = [fName '_' timeStamp '_ResponseMap.avi'];
-    writerObj = VideoWriter(movName,'Uncompressed AVI');
-    writerObj.FrameRate = 1;
-    open(writerObj);
-    stImg = (baselineImg-min(baselineImg(:)))/max(baselineImg(:));
-    for i = 1:size(baselineImg,3)
-        imagesc(stImg(:,:,i),[0 0.5]);
-        colormap(gray);
-        axis image;
-        axis off;
-        set(gca,'Units','normalized','Position',[0 0 1 1]);
-        hold on;
-        
-        red = cat(3, ones(stackDim(1:2)),zeros(stackDim(1:2)),zeros(stackDim(1:2)));
-        green = cat(3, zeros(stackDim(1:2)),ones(stackDim(1:2)),zeros(stackDim(1:2)));
-        
-        h_red = imshow(red);
-        set(h_red,'AlphaData',nor_dffPlus(:,:,i));
-        
-        h_green = imshow(green);
-        set(h_green,'AlphaData',nor_dffNegative(:,:,i));
-        hold off;
-        
-        frame = getframe;
-        writeVideo(writerObj,frame);
-    end
-    
-    close(writerObj);
-    
-    cd(currentPath) 
-     
-    
-    
-    
+%% Finding stacks coincident with shocks
+disp('Finding stacks coincident with shocks')
+stack.inds.start = FindStimPulses(data.camTrigger,10,3.7,(exposureTime*stack.dim(3)*samplingRate),'exact');
+if isempty(stack.inds.start)
+    error('Camera trigger signal not detected!')
+    return;
 end
-    
-    
-    
-    
-    
+stack.times = data.t(stack.inds.start);
+stack.N = numel(stack.times);
+stack.interval = median(diff(stack.times(:)));
+% stimChan = stimChannel(stimIsolGain~=0);
+
+stack.inds.shock = zeros(size(stim.inds));
+for cs = 1:numel(stim.inds)
+    [~,stack.inds.shock(cs)] =  min(abs(stack.inds.start-stim.inds(cs)));
+end
+stack.inds.shock = unique(stack.inds.shock); % This is because cam trigger can terminate before ephys signals.
 
 
+
+
+
+
+
+% %% Plot all trials in max stim int conditions
+% maxIntTrials = find(tData.stimAmp == max(tData.stimAmp));
+% for trial = 1:numel(maxIntTrials)
+%     figure('Name',['Highest stim int, trial #' num2str(trial)]) 
+%     plot(trialSegData(1).time,trialSegData(maxIntTrials(trial)).raw)
+%     xlim([-5 12]), ylim([-1 1])
+%     set(gca,'tickdir','out', 'ytick',[])
+%     title([['Highest stim int, trial # ' num2str(trial)]],'fontsize',14)
+%     xlabel('Time (sec)')
+%     box off
+% end
+
+
+ %% Comparing results from both KMeans methods
+% 
+% tempMat1 = [];
+% cIndMat1 = [];
+% tempMat2 =[];
+% cIndMat2 = [];
+% for clstr = 1:10
+%     cellsInCluster1 = find(kData1.idx==clstr);
+% %     tempMat1 = [tempMat1; data.cellRespMat.trialAvg(cellsInCluster1,:,1,4)];
+%     tempMat1 = [tempMat1; mean(data.cellRespMat.trialAvg(cellsInCluster1,:,1,4),1)];
+%     cIndMat1 = [cIndMat1; kData1.idx(cellsInCluster1)];
+%     cellsInCluster2 = find(kData2.idx == clstr);
+%     tempMat2 = [tempMat2; data.cellRespMat.trialAvg(cellsInCluster2,:,1,4)];
+%     cIndMat2 = [cIndMat2; kData2.idx(cellsInCluster2)];
+% end
+% % figure('Name','Method1')
+% % imagesc(1:size(tempMat1,1),cIndMat1,tempMat1)
+% % cLim = get(gca,'clim')
+% % set(gca,'clim',[cLim(1)*0.2 cLim(2)*0.2])
+% 
+% figure('Name','Method2')
+% imagesc(1:size(tempMat2,1),cIndMat2,tempMat2)
+% cLim = get(gca,'clim')
+% set(gca,'clim',[cLim(1)*0.2 cLim(2)*0.2])
