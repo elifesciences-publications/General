@@ -34,7 +34,7 @@ elseif nargin == 2
 elseif nargin ==3
     slopeThresh = varargin{2};
     ampThresh  = varargin{3};
-    x = zscore(x);
+    x = zscore(x);goit
     minPkDist = defMinPkDist;
 elseif nargin ==4
     slopeThresh = varargin{2};
