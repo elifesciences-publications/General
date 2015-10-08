@@ -17,7 +17,7 @@ function pkInds = FindStimPulses(varargin)
 
 %% Default Values
 x = varargin{1};
-defSlopeThresh = 10;
+defSlopeThresh = [];
 defAmpThresh = 20;
 defMinPkDist = 3;
 
@@ -62,18 +62,25 @@ if isempty(minPkDist)
     minPkDist = defMinPkDist;
 end
 
-dx = zscore(diff(abs(x)));
-onsetInds = findpeaks_hht(dx);
-onsetInds(dx(onsetInds)< slopeThresh) = [];
 pkInds = findpeaks_hht(x);
 pkInds(x(pkInds)<ampThresh) = [];
 
-% Validating each pk by checking for a nearby preceding onset 
-for pk = 1:numel(pkInds)
-    pkOnLat = pkInds(pk)-onsetInds;
-    if ~ any((pkOnLat>=1 & pkOnLat<5))
-        pkInds(pk)=[];
+% Validating each pk by checking for a nearby preceding onset
+if ~isempty(slopeThresh)
+    dx = zscore(diff(abs(x)));
+    onsetInds = findpeaks_hht(dx);
+    onsetInds(dx(onsetInds)< slopeThresh) = [];
+    if isempty(onsetInds)
+        error('Did not find any onset points, consider lowing slope threshold!')
     end
+    removeInds = [];
+    for pk = 1:numel(pkInds)
+        pkOnLat = pkInds(pk)-onsetInds;
+        if ~ any((pkOnLat>=1 & pkOnLat<5))
+            removeInds = [removeInds;pk];
+        end
+    end
+    pkInds(removeInds) =[];
 end
 
 

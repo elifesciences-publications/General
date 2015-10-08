@@ -3,7 +3,7 @@
 function artlessSignal = DeartifactWithGaussInterp(signal,samplingInt,stimInds,preStimPeriod, postStimPeriod,alpha)
 % DeartifactWithGaussInterp2 - Remove stimulus artifacts by Gaussian sampling interpolation near the artifact.
 %                       period and also adds some Hamming modulated noise
-%   data_mod = DeartifactWithGaussInterp2(data,samplingInt,stimIndices,preStimPeriod, postStimPeriod);
+%   data_mod = DeartifactWithGaussInterp2(data,samplingInt,stimIndices,preStimPeriod, postStimPeriod,gaussKerAlpha);
 %   data        - timeseries with artifacts
 %   samplingInt - samplingInterval
 %   stimInds    - stimulus indices
@@ -41,17 +41,7 @@ for stim = 1:numel(stimInds)
     kernel2(badInd:end) = min(kernel2);
     kernel2 = (kernel2-min(kernel2))/max(kernel2);
     
-%     kernel2 = gausswin(3*lenArt,3*alpha); % Making kernel longer than signal to accommodate for circhift coming up
-%     [~, kerMaxInd] = max(kernel,[],1);
-%     [~,sigMaxInd] = max(abs(artifact),[],1);
-%     
-%     kernel2 = circshift(kernel2(:),sigMaxInd-kerMaxInd); % Shifting to align peak of kernel with peak of artifact
-%     kernel2([1:lenArt 2*lenArt+1:end])=[]; % Taking the central segment of kernel2 that matches signal in length
-%     kernel2 = kernel2-min(kernel2);
-%     kernel2 = kernel2*max(kernel2);
-%     
-    
-    dt_max = 60; % Max interval with which to sample.
+dt_max = 60; % Max interval with which to sample.
     dtVec = (dt_max-1)*(1-kernel2);
     dtVec = round(dtVec+1);
     
