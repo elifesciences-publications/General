@@ -23,14 +23,13 @@ kernel = kernel/sum(kernel);
 
 lastPt = min(stack.N,size(data.cells.raw,2));
 nCells = size(data.cells.raw,1);
-data.cells.time = data.t(stack.inds.start)+1;
-extraStacks = size(data.cells.raw,2)- length(data.cells.time);
-if extraStacks > 0     
-    data.cells.raw(:,1:length(data.cells.time)) = [];
-elseif extraStacks < 1
-    data.cells.time = data.cells.time(1:size(data.cells.raw,2));
+data.cells.time = data.t(stack.inds.start);
+if length(data.cells.time) > size(data.cells.raw,2)
+    preRecStacks = 
+    data.cells.time(1:)
+elseif
 end
-
+data.cells.time = data.cells.time(1:size(data.cells.raw,2));
 
 disp(['Smoothing cellular Ca++ responses with lowpass of  ' num2str(lpf)])
 if strcmpi(smoothingType,'conv')
