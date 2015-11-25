@@ -9,6 +9,5 @@ x = x(:)';
 y = interp1([0 pks pks(end)+1], [x(1) x(pks) x(end)],1:length(x));
 
 
-
 end
 

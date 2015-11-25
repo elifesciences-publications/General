@@ -1,0 +1,198 @@
+
+function stimInds = FindStimPulses(varargin)
+% FindStimPulses - Returns the indices of stimulus pulses/artifacts in a
+%   timeseries
+% stimInds = FindStimPulses(x,slopeThresh,ampThresh,minPeakDistance)
+% Inputs:
+% x - timeseries in which to find stim pulse
+% slopeThresh - slope threshold in units of std for detecting pulse onset
+%   (default = 20)
+% ampThresh - amplitude threshold in units of std (default = 20)
+% minPeakDistance - minimum expected distance between consecutive peaks
+% stimInds = FindStimPulse(...,'exact'), using the 'exact' option results
+%   in finding peaks that are exactly above the specified amplitude
+%   threshold
+%
+% Author: AP
+
+%% Default Values
+x = varargin{1};
+defSlopeThresh = 10;
+defAmpThresh = 20;
+defMinPkDist = 3;
+
+if nargin == 1;
+    x = zscore(x);
+    slopeThresh = defSlopeThresh;
+    ampThresh = defAmpThresh;
+    minPkDist = defMinPkDist;
+elseif nargin == 2
+    slopeThresh = varargin{2};
+    x = zscore(x);
+    ampThresh = defAmpThresh;
+    minPkDist = defMinPkDist;
+elseif nargin ==3
+    slopeThresh = varargin{2};
+    ampThresh  = varargin{3};
+    x = zscore(x);
+    minPkDist = defMinPkDist;
+elseif nargin ==4
+    slopeThresh = varargin{2};
+    ampThresh  = varargin{3};
+    minPkDist = varargin{4};
+    x = zscore(x);
+elseif nargin ==5 & strcmpi(vararr)
+    slopeThresh = varargin{2};
+    ampThresh  = varargin{3};
+    minPkDist = varargin{4};
+elseif nargin > 5
+    error('No more than 5 inputs accepted!')
+end
+
+if isempty(slopeThresh)
+    slopeThresh = defSlopeThresh;
+end
+
+if isempty(ampThresh)
+    ampThresh = defAmpThresh;
+end
+if isempty(minPkDist)
+    minPkDist = defMinPkDist;
+end
+
+dx = zscore(diff(abs(x)));
+onsetInds = findpeaks_hht(dx);
+onsetInds(dx(onsetInds)< slopeThresh) = [];
+pkInds = findpeaks_hht(x);
+pkInds(x(pkInds)<ampThresh) = [];
+
+% Validating each pk by checking for a nearby preceding onset 
+for pk = 1:numel(pkInds)
+    pkOnLat = pkInds(pk)-onsetInds;
+    if ~ any((pkOnLat>=1 & pkOnLat<5))
+        pkInds(pk)=[];
+    end
+end
+
+
+
+defSlopeThresh = 10;
+defAmpThresh = []; % Indicates not using amplitude (ampThresh = 'UI' implies interative choosing of amplitude)
+defMinPeakDistance = 1e-3; % Typically, the stim pulse duraction does not exceed this value in our expts
+
+signals = varargin{1};
+if all(size(signals)>1)
+    errordlg('Signal input to FindStimPulses must be a vector'); % In future versions, I can implement matrix inputs
+end
+
+%% Make sure that signals are arranged as columns
+if size(signals,2) >  size(signals,1)
+    signals = signals';
+elseif size(signals,2) == size(signal,s1)
+    warndlg('Make sure that the timeseries form columns of the input matrix')
+end
+
+
+%%
+exactFlag = false;
+if nargin ==0
+    errordlg('Please enter an input!')
+elseif nargin < 2
+    slopeThresh = defSlopeThresh;
+    ampThresh = defAmpThresh;
+    minPeakDistance = defMinPeakDistance; 
+elseif nargin < 3
+     slopeThresh = varargin{2};
+    ampThresh = defAmpThresh;
+    minPeakDistance = defMinPeakDistance; 
+elseif nargin < 4
+    slopeThresh = varargin{2};
+    ampThresh = varargin{3};
+    minPeakDistance = defMinPeakDistance;
+elseif (nargin ==5) & strcmpi(varargin{5},'exact')
+    slopeThresh = varargin{2};
+    ampThresh = varargin{3};   
+    minPeakDistance = varargin{4};
+    exactFlag = true;
+else
+    slopeThresh = varargin{2};
+    ampThresh = varargin{3};   
+    minPeakDistance = varargin{4};
+end
+
+if isempty(slopeThresh) && isempty(ampThresh)
+    slopeThresh = defSlopeThresh;
+elseif isempty(slopeThresh) && ~isempty(ampThresh)
+    slopeThresh = 0;
+end
+
+if isempty(minPeakDistance)
+    minPeakDistance = defMinPeakDistance;
+end
+
+if ~exactFlag
+[signals, ~, ~] = ZscoreByHist(signals);
+end
+
+%% Slope-based identification of stimulus artifact onsets
+if (slopeThresh~=0)
+fprintf('\nSlope-based identification of stimuli...\n')
+dSignals=diff(signals); 
+tmp = sort(abs(dSignals),'ascend');
+muSlope = repmat(mean(tmp(1:round(size(tmp,1)/20))),size(dSignals,1),1); % For bottom 5% values
+sigSlope = repmat(std(tmp(1:round(size(tmp,1)/20))),size(dSignals,1),1);
+dSignals = (dSignals-muSlope)./sigSlope; % Converts to z-scores
+transients=find(dSignals >= slopeThresh);
+else 
+ transients  = [];
+end
+
+%% Amplitude threshold-based identification of artifact times
+if (nargin > 3) && (strcmpi(ampThresh,'UI'))
+fprintf('\n Amplitude-based identification of stimuli... \n')
+    figure('Name', 'Click on 2 locations along the time axis to expand traces')
+    title('Detecting stimulus artifacts')
+    plot(time,signals) 
+    [x,~]=ginput(2);
+    close    
+    minPt = find(time>= min(x)); minPt = minPt(1);
+    maxPt = find(time>=max(x)); maxPt = maxPt(1);
+    figure('Name', ' Select an amplitude threshold')
+    plot(time,signals)
+    axis([min(x) max(x) 0 30*std(signals(minPt:maxPt))]), set(gca,'ytick',[])
+    ampThresh = ginput(1); ampThresh=ampThresh(2);
+    [~,stimPeaks] = FindPeaksByLevel(signals,ampThresh);
+%     stimPeaks = findpeaks_hht(signals);
+%     stimPeaks = find(signals >= ampThresh);
+%     stimPeaks = find(abs(datProd)>=abs(ampThresh)); 
+    close
+elseif (nargin > 3) && ~(isempty(ampThresh))
+fprintf('\n Amplitude-based identification of stimuli... \n')
+    [~,stimPeaks] = FindPeaksByLevel(signals, ampThresh);    
+else
+    stimPeaks = transients;
+end
+
+if isempty(transients) && (slopeThresh==0)
+    transients = stimPeaks; % transients is used in the later part of the program
+end
+
+stimInds  = stimPeaks;
+
+% stimIndBool = zeros(size(signals));
+% stimIndBool((signals(1:end-1) < ampThresh) & (signals(2:end)>= ampThresh)) = 1;
+% stimIndBool((signals(1:end-2) < ampThresh) & (signals(3:end)>= ampThresh)) = 1;
+% stimInds = find(stimIndBool);
+
+
+% transients = union(transients(:), stimPeaks(:));
+
+
+
+%% Nearest neighbor method of eliminating all transients
+fprintf('\n Eliminating artifacts closer than minimum specified distance... \n')
+amps = ones(size(stimInds));
+[~, stimInds] = RemovePeaksWithinRefractoryPeriod(amps, stimInds, minPeakDistance);
+
+
+
