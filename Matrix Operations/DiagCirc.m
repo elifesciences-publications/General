@@ -10,9 +10,10 @@ end
 if any(size(M)==1)
     error('Input is a vector, this function is meaningless for it!')
 end
-n = size(M,2);
-nRows = size(M,1);
-D = nan(size(M,1),n);
+n = max(size(M));
+blah = diag(M);
+nRows = numel(blah);
+D = nan(nRows,n);
 D(:,1) = diag(M);
 ctr = 1;
 for d = 1:n-1
