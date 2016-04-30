@@ -28,18 +28,13 @@ elseif nargin ==3;
     tol = varargin{2};
 end
 %## Iteratively find a circle that fits indices well
-figure
+
 for iter = 1:nIter  
-    cla
     [theta,rho] = cart2pol(x,y);
     rho_fit = mean(rho)*ones(size(rho));
     error = sqrt(sum((rho-rho_fit).^2))/numel(rho);   
     disp(['Iter# ' num2str(iter) ', Error = ' num2str(error*100) '%'])
     [x_fit,y_fit] = pol2cart(theta,rho_fit);
-    plot(x,y,'.'),axis image,hold on
-    plot(x_fit,y_fit,'r.')
-    xlim([-inf inf])
-    title(['Iter# ' num2str(iter) ', Error = ' num2str(error*100) '%'])
     if iter > 1 && ((error_prev-error)*100) < tol
         disp(['Error within tolerance of ' num2str(tol) ' %, quitting!'])
         break
@@ -52,15 +47,16 @@ for iter = 1:nIter
 end
 %## Fill in missing points in the circle and uniformly downsample
 [theta,rho] = cart2pol(x_fit,y_fit);
-tt = interp1(1:length(theta),theta,1:0.2:length(theta),'spline');
-overInds = find(abs(tt)>pi);
-tt(overInds)=[];
+tt = linspace(-pi,pi,numel(theta));
 rr = interp1(theta,rho,tt,'spline');
-[tt,inds] = sort(tt);
-rr = rr(inds);
-theta = tt(1:5:end);
-rho = rr(1:5:end);
-[x,y] = pol2cart(theta,rho);
-varargout{1} = [x(:)+shift(1), y(:)+shift(2)];
+
+[x_fit,y_fit]= pol2cart(tt,rr);
+figure
+plot(x_fit,y_fit,'r.'), hold on
+plot(x,y,'b.'),axis image
+legend('Fit','Original','Location','best')
+xlim([-inf inf])
+title(['Iter# ' num2str(iter) ', Error = ' num2str(error*100) '%'])
+varargout{1} = [x_fit(:)+shift(1), y_fit(:)+shift(2)];
 end
 
