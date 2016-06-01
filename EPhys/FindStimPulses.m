@@ -62,13 +62,13 @@ if isempty(minPkDist)
     minPkDist = defMinPkDist;
 end
 
-pkInds = findpeaks_hht(x);
+pkInds = GetPks(x);
 pkInds(x(pkInds)<ampThresh) = [];
 
 % Validating each pk by checking for a nearby preceding onset
 if ~isempty(slopeThresh)
     dx = zscore(diff(abs(x)));
-    onsetInds = findpeaks_hht(dx);
+    onsetInds = GetPks(dx);
     onsetInds(dx(onsetInds)< slopeThresh) = [];
     if isempty(onsetInds)
         error('Did not find any onset points, consider lowing slope threshold!')
