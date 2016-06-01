@@ -1,7 +1,7 @@
 function varargout = FindPeaksByLevel(x,level)
 % FindPeaksByLevel - FindPeaks within a signal that exceed a certain level
 % 
-% [pks,pkInds] = FindPeaksByLevel;
+% [pks,pkInds] = FindPeaksByLevel(x);
 
 pkInds = findpeaks_hht(x);
 pks = x(pkInds);
