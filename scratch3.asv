@@ -61,7 +61,7 @@ if isempty(nFramesInTrl)
 end
 nTrls = size(IM_proc_crop,3)/nFramesInTrl;
 trlStartFrames =  (0:nTrls-1)*750 + 1;
-[tailCurv, tailCurv_uncorrected] = SmoothenMidlines(mlInds,IM_proc_crop,3,'plotBool',0,...
+tailCurv = SmoothenMidlines(mlInds,IM_proc_crop,3,'plotBool',0,...
     'pauseDur',0,'smoothFactor',8,'dsVecs',dsVecs,'trlStartFrames',trlStartFrames);
 
 
