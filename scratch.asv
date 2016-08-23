@@ -1,8 +1,7 @@
 
 %% Plot tail curvatures atop moving fish
-fps = 500;
-pauseDur = [];
-trl = 7;
+trl = 2;
+pauseDur = 0.1;
 inds = (trl-1)*750 + 1: (trl-1)*750 + 750;
 var1 = IM_proc_crop(:,:,inds);
 var2 = repmat([71 71],numel(inds),1);
@@ -12,20 +11,20 @@ tC = tailCurv(:,:,inds);
 PlayFishTracking2(IM_proc_crop,'fishPos',[71 71], 'midlineInds',midlineInds,'tailAngles',tA,'plotCurv',1,'tailCurv',tailCurv,'frameInds',inds,'pauseDur',pauseDur);
 
 %%
+tic
+ref = max(IM,[],3);
+IM_proc = IM - repmat(ref,[1,1,size(IM,3)]);
+toc
+trl = {};
+trl{1} = IM_proc_crop(:,:,1:750);
+trl{2} = IM_proc_crop(:,:,751:1500);
+[fp{1},~] = GetFishPos(trl{1}, 25,'filter',bp,'process','parallel','lineLen',25);
+[fp{2},~] = GetFishPos(trl{2}, 25,'filter',bp,'process','parallel','lineLen',25);
 
-zThr = 1.5;
-mu = mean(IM_proc_crop(:));
-sigma = std(IM_proc_crop(:));
-minPxls = 40;
-maxPxls = 100;
-
-inds = 69;
-mlInds = GetMidlinesByThinning(IM_proc_crop(:,:,inds),'zThr',zThr,...
-    'mu',mu,'sigma',sigma,'minPxls',minPxls,'maxPxls',maxPxls,...
-    'fishPos',repmat([71 71],numel(inds),1));
+procDir = fullfile(imgDir,'proc');
 
 
-lineLens = [10 9 8 7 6 5];
-
-midlineInds = GetMidlines(IM_proc_crop,(fishPos./fishPos)*(size(IM_proc_crop,1)/2+1),...
-    lineLens,'bmp','procType','parallel','headVec',hOr_crop);
+for jj = 1:size(IM_proc,3)
+    fName = ['Img_' sprintf('%0.4d', jj)];    
+    imwrite(IM_proc(:,:,jj),fullfile(procDir,fName),'bmp')
+end
