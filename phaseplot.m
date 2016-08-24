@@ -47,6 +47,6 @@ dy=sin(phase).*dar(2).*sz*.5;
 
 h=arrow([x-dx y-dy],[x+dx y+dy],varargin{:});
 set(h,'clipping','on')
-if (nargout<1) clear h; end;
+if (nargout<1), clear h; end;
 
 
