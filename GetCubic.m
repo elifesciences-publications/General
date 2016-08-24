@@ -11,12 +11,11 @@ function varargout = GetCubic(x)
 % pks_max - Crest indices
 % pks_min - Trough indices
 
-pks_min = findpeaks_hht(-x);
-pks_max = findpeaks_hht(x);
+pks_min = GetPks(-x);
+pks_max = GetPks(x);
 x = x(:)';
 s1 = interp1([0 pks_min(:)' length(x)+1],[x(1) x(pks_min(:)) x(end)],1:length(x),'cubic');
 s2 = interp1([0 pks_max(:)' length(x)+1],[x(1) x(pks_max(:)) x(end)],1:length(x),'cubic');
-s1  = s1;
 y = x - (s1+s2)/2;
 
 varargout{1} = y;

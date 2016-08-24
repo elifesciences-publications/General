@@ -1,4 +1,4 @@
-function out=mmpolar(varargin)
+function u=mmpolar(varargin)
 %MMPOLAR Polar Plot with Settable Properties. (MM)
 % MMPOLAR(Theta,Rho) creates a polar coordinate plot using the angle Theta
 % in RADIANS and radius in Rho. Rho can contain negative values.
