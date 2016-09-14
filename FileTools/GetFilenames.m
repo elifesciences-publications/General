@@ -3,7 +3,13 @@ function fileNames = GetFilenames(fileDir, varargin)
 % GetFilenames - Given the path to a directory and an optional search
 %   string, returns the names of files in the dir that have the seach
 %   string in them (case-insensitive)
-%  fileNames = GetFilenames(fileDir,varargin);
+%  fileNames = GetFilenames(fileDir,searchStr);
+% Inputs:
+% fileDir - Directory in which to look for files
+% searchStr - Search string by which to restrict to file search in
+%   directory
+% 
+% Avinash Pujala, JRC/HHMI, 2016
 
 filesInDir = dir(fileDir);
 filesInDir = {filesInDir.name};
