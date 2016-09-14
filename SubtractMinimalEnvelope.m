@@ -9,7 +9,7 @@ function varargout = SubtractMinimalEnvelope(x)
 % minimaEnvelope - the interpolated minima envelope
 % minimaInds - indices of the minima found in the original signal
 
-minimaInds = findpeaks_hht(-x);
+minimaInds = GetPks(-x);
 x = x(:)';
 s = interp1([0 minimaInds(:)' length(x)+1],[x(1) x(minimaInds(:)) x(end)],1:length(x),'cubic');
 y = x - s;
