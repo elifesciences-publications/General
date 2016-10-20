@@ -12,14 +12,13 @@ rowInd_start = 1;
 for d1 = 1:size(dataMat,1) % Ablated or not   
     for d2 = 1:size(dataMat,2) % Stim type - dark or vib
         for d3 = 1:size(dataMat,3) % Fish Num
-           sessionNum = data.(grpNames{d1}).(stimNames{d2}){d3}.sessionNum;
+%             sessionNum = data.(grpNames{d1}).(stimNames{d2}){d3}.sessionNum;
             for d5 = 1:size(dataMat,5)
                 blah = squeeze(dataMat(d1,d2,d3,:,d5,:))';
-                blah(:,end)=[]; % Remove session num from here
                 nanRows = find(sum(isnan(blah),2)== size(blah,2));
                 blah(nanRows,:) = [];
                 rowInd_end = rowInd_start + size(blah,1)-1;
-                temp  = repmat([d1,d2,sessionNum,d3,d5],size(blah,1),1);
+                temp  = repmat([d1,d2,d3,d5],size(blah,1),1);
                 bendVec = 1:size(blah,1);
                 temp = cat(2,temp,bendVec(:),blah);                
                 fData(rowInd_start:rowInd_end,:) = temp;
@@ -67,8 +66,7 @@ while isempty(fldNames) && count < size(dataMat,5)
     count = count + 1;    
         fldNames = fieldnames(data.abl.vib{count});
 end
-sessInd = find(strcmpi(fldNames,'sessionNum'));
-fldNames(sessInd) = [];
+
 varNames_sub = cell(1,length(fldNames));
 for fn = 1:length(fldNames)
     fldName = fldNames{fn};
@@ -77,11 +75,7 @@ for fn = 1:length(fldNames)
 end
 
 varNames_all = [{'AblationType','AblationBool','StimType',...
-    'SessionNum','FishNumInGroup','TrialNum','BendNum'}, ...
-    varNames_sub,'FishID'];
+    'FishNumInGroup','TrialNum','BendNum'}, varNames_sub,'FishID'];
 
 if size(varNames_all,2) ~= size(fData_cell)
-    error('Column labels do not match the size of the data array!')
 end
-
-fData_cell = [varNames_all; fData_cell];
