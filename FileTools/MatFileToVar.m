@@ -1,4 +1,10 @@
 function var = MatFileToVar(matFileObj)
+% MatFileToVar - Given a matFileObj, returns a structure variable with the
+%   same fields as mafile obj
+% var = MatFileToVar(matFileObj);
+% 
+% Avinash Pujala, JRC/HHMI, 2016
+
 tic
 var = struct;
 fldNames = fieldnames(matFileObj);

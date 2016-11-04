@@ -12,6 +12,7 @@ if nargin ==0
 elseif nargin ==1
     if isdir(varargin{1});
         cd(varargin{1});
+        
         [file,path] = uigetfile('*.mat');
         var = matfile(fullfile(path,file));
     else
