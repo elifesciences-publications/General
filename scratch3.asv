@@ -38,23 +38,5 @@
 % linkaxes(ax,'x');
 
 %% Test code
-for fish = 1:length(procData);
-    [outDir, ~] = fileparts(procData{fish}.Properties.Source);
-    subDirName = 'WT';
-    outDir = fullfile(outDir,subDirName);
-    if exist(outDir)~=7
-        mkdir(outDir)
-    end
-    close all
-    PlotWTs(procData{fish}.W);
-    h = get(0,'children');
-    disp(['Saving figures for fish # ' num2str(fish)]);
-    for fig = 1:length(h)
-        saveas(h(fig), fullfile(outDir,['Fig_' sprintf('%.2d',h(fig))]))
-    end
-   dispNext = input('Display next set of figures?(y/n): ','s');
-   if strcmpi(dispNext,'n')
-       break
-   end    
-end
+
 

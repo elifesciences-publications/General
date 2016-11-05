@@ -14,10 +14,10 @@ elseif nargin ==1
     if isdir(varargin{1});
         cd(varargin{1});
         procFileNames = GetFilenames(varargin{1},'searchStr','proc','ext','mat');
-        if isempty(procFileNames)
+        if isempty(procFileNames) || iscell(procFileNames)
                [file,path] = uigetfile('*.mat');
         else
-            file = procFileNames{1};
+            file = procFileNames;
             path = varargin{1};
         end     
         var = matfile(fullfile(path,file));
