@@ -7,12 +7,12 @@ function fileNames = GetFilenames(fileDir, varargin)
 % fileNames = GetFilenames(fileDir,'searchStr',searchStr,'ext',ext);
 % Inputs:
 % fileDir - Directory in which to look for files
-% searchStr - Finds only files with names containgin the search string.
+% nameMatchStr - Finds only files with names containing the string, nameMatchStr.
 % ext - Finds files with specified extension
 %
 % Avinash Pujala, JRC/HHMI, 2016
 
-searchStr = '.';
+nameMatchStr = '.';
 ext = '*';
 
 for jj = 1:numel(varargin)-1
@@ -20,7 +20,7 @@ for jj = 1:numel(varargin)-1
         val = varargin{jj+1};
         switch lower(varargin{jj});
             case 'searchstr'
-                searchStr = val;
+                nameMatchStr = val;
             case 'ext'
                 ext = val;
         end
@@ -35,7 +35,7 @@ matchInds =[];
 fldrInds = [];
 for fn = 1:length(filesInDir)
     fName = filesInDir{fn};
-    if ~isempty(strfind(fName,searchStr))
+    if ~isempty(strfind(fName,nameMatchStr))
         matchInds = [matchInds;fn];
     end
     if isdir(fullfile(fileDir,fName))
