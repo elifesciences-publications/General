@@ -30,7 +30,7 @@ end
 if nargin ==0
     [file,path] = uigetfile('*.mat');
     var = matfile(fullfile(path,file));
-elseif nargin ==1
+elseif nargin > 0
     if isdir(varargin{1});
         cd(varargin{1});
         procFileNames = GetFilenames(varargin{1},'nameMatchStr',nameMatchStr,'ext','mat');
