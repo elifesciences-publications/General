@@ -28,7 +28,7 @@ for jj = 1:numel(varargin)
 end
 
 if nargin ==0
-    [file,path] = uigetfile('*.mat');
+    [file,path] = uigetfile('*.mat','Select .mat file to open...');
     var = matfile(fullfile(path,file));
 elseif nargin > 0
     if isdir(varargin{1});
