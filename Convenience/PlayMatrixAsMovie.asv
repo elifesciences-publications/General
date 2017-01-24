@@ -1,0 +1,22 @@
+function PlayMatrixAsMovie(M, varargin)
+%PlayMatrixAsMovie Given a 3- or 4D matrix, plays images as movie with specified 
+% pause duration between images
+% PlayMovie(M);
+% PlayMovie(M,pauseDir)
+% 
+
+pauseDur = 0;
+if nargin >1
+    pauseDur = varargin{1};
+end
+
+fh = figure('Name','Movie');
+if ndims(M)==3
+    for jj = 1:size(M,3)
+    end
+else
+end
+
+
+end
+

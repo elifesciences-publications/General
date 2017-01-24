@@ -4,7 +4,7 @@ function varargout = OpenMatFile(varargin)
 % var = OpenMatFile();
 % var = OpenMatFile(fullPathToMatFile);
 % var = OpenMatFile(matFile);
-% var = OpenMatFile(matFile,'nameMatchStr',nameMatchStr);
+% var = OpenMatFile(pathToMatFileDir,'nameMatchStr',nameMatchStr);
 % Inputs:
 % fullPathToMatFile - Full path to .mat file ()
 % matFile - .mat file that has already been loaded into the workspace or

@@ -1,42 +1,21 @@
 
-% Wavelet demo
-freqRange = [20 70];
-freqScale = 'lin';
-sigmaXY = 1;
-dt = 1/1000;
-t = 0:dt:1;
-A = 1; 
-% x = A*chirp(t,25,1,55,'q',[],'convex') + rand(size(x));
-x = A*(Standardize(1*sin(2*pi*53*t) + 2*sin(2*pi*31*t))-0.5);
 
-% sigmaXY = var(x);
-% x = A*sin(2*pi*23*t);
+saveDir = 'S:\Avinash\Ablations and behavior\GrpData';
 
-
-[W,freq] = ComputeXWT(x,x,t,'freqRange',freqRange,'freqScale',freqScale,'sigmaXY',sigmaXY);
-
-figure('Name','W')
-ax =[];
-ax(1) = subplot(2,1,1);
-if strcmpi(freqScale,'log')
-    imagesc(t,log2(freq),abs(W))
-    yt = get(gca,'ytick');
-    yt(mod(yt,1)~=0) = [];
-    ytl = 2.^yt;
-    box off
-    set(gca,'tickdir','out','ydir','normal','ytick',yt,'yticklabel',ytl)
-else    
-    imagesc(t,freq,abs(W))
-    yt = get(gca,'ytick');
-    box off
-    set(gca,'tickdir','out','ydir','normal','clim',[0 A^2])
+fldNames = fieldnames(data_xls);
+data_array = cell(numel(data_xls.bendAmp)+1,length(fieldnames(data_xls)));
+for fld = 1:length(fldNames)
+    fldName = fldNames{fld};
+    fldName(1) = upper(fldName(1));
+    data_array{1,fld} = fldName;
+    vars = data_xls.(fldNames{fld});
+    if iscell(vars(1))
+        data_array(2:end,fld) = data_xls.(fldNames{fld});
+    else
+        data_array(2:end,fld) = num2cell(data_xls.(fldNames{fld}));
+    end    
 end
 
-ax(2) = subplot(2,1,2);
-plot(t,x);
-box off
-linkaxes(ax,'x');
-ylim([-inf inf])
-
-
-
+ts = datestr(now,30);
+fName = ['Peak Info for Group Data_' ts];
+xlswrite(fullfile(saveDir,fName),data_array)
