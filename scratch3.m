@@ -1,21 +1,67 @@
 
+pkThr = 0.5;
+polarity = 1;
+thrType = 'rel';
+minPkDist = round(15*6000);
+prePer = 0.5;
+postPer = 1;
+lpf = 100;
 
-saveDir = 'S:\Avinash\Ablations and behavior\GrpData';
 
-fldNames = fieldnames(data_xls);
-data_array = cell(numel(data_xls.bendAmp)+1,length(fieldnames(data_xls)));
-for fld = 1:length(fldNames)
-    fldName = fldNames{fld};
-    fldName(1) = upper(fldName(1));
-    data_array{1,fld} = fldName;
-    vars = data_xls.(fldNames{fld});
-    if iscell(vars(1))
-        data_array(2:end,fld) = data_xls.(fldNames{fld});
-    else
-        data_array(2:end,fld) = num2cell(data_xls.(fldNames{fld}));
-    end    
+pks = GetPks(data.patch2,'polarity',polarity,'peakThr',pkThr,...
+    'thrType',thrType,'minPkDist',minPkDist);
+
+rp = randperm(length(pks));
+spikeInds = pks(rp(1:3));
+spikeTimes = data.t(spikeInds);
+raw = zscore(data.ch2);
+smooth = zscore(SmoothVRSignals(raw,1/6000,lpf));
+raw_trl = SegmentDataByEvents(raw,1/6000,spikeInds,prePer,postPer);
+patch = zscore(data.patch2);
+patch_trl = SegmentDataByEvents(patch,1/6000,spikeInds,prePer,postPer);
+smooth_trl = SegmentDataByEvents(smooth,1/6000,spikeInds,prePer, postPer);
+time_trl = SegmentDataByEvents(data.t,1/6000,spikeInds,prePer,postPer);
+
+% figure
+% plot(data.t,data.patch2)
+% hold on
+% plot(data.t(pks),data.patch2(pks),'ro')
+
+
+f1 = figure('Name','Trigeminal-elicited escapes');
+f2 = figure('Name', 'Trigeminal-elicited escapes (smoothed)');
+yShift = 60;
+yOff  = nan(length(spikeTimes),1);
+for ss = 1:length(spikeTimes)
+    offset = yShift*(ss-1);
+    yOff(ss) = offset;
+    figure(f1)
+    plot(time_trl{ss}-spikeTimes(ss),raw_trl{ss}-offset,'k')
+    hold on
+    plot(time_trl{ss}-spikeTimes(ss),2*patch_trl{ss}-offset,'r')
+    
+    figure(f2)
+    l1 = plot(time_trl{ss}-spikeTimes(ss),zscore(smooth_trl{ss})-offset*0.75,'b');
+    hold on
+    l2 =  plot(time_trl{ss}-spikeTimes(ss),2*patch_trl{ss}-offset*0.75,'r');
+   
 end
+figure(f1)
+box off
+set(gca,'tickdir','out','ytick',sort(-yOff),'yticklabel',length(spikeInds):-1:1)
+xlim([-inf inf])
+ylim([-inf inf])
+xlabel('Time (sec)')
+ylabel('Trials')
+legend('Contra')
 
-ts = datestr(now,30);
-fName = ['Peak Info for Group Data_' ts];
-xlswrite(fullfile(saveDir,fName),data_array)
+figure(f2)
+box off
+set(gca,'tickdir','out','ytick',sort(-yOff),'yticklabel',length(spikeInds):-1:1)
+xlim([-inf inf])
+ylim([-inf inf])
+xlabel('Time (sec)')
+ylabel('Trials')
+legend([l1,l2],'Contra EMG','M-Cell');
+
+

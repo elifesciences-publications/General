@@ -31,8 +31,8 @@ else
     for jj = 1:sizeVec(dim)
         expr = GetCorrectExpression(sizeVec,dim,jj);
         eval(['y' expr '= (x' expr '-x_min)./(x_max-x_min);']);
-%         eval(['y' expr '= (x' expr '-x_min);']);
-%         eval(['y' expr '= (x' expr '-x_mean);']);
+        %         eval(['y' expr '= (x' expr '-x_min);']);
+        %         eval(['y' expr '= (x' expr '-x_mean);']);
     end
 end
 end
