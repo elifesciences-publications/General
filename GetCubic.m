@@ -4,12 +4,14 @@ function varargout = GetCubic(x)
 %                    original signal
 % 
 % y = GetCubic(x);
-% [y,s,pks_max,pks_min] = GetCubic(x);
+% [y,s,pks_max,pks_min, maxEnv, minEnv] = GetCubic(x);
 % Outputs:
 % s - Mean of the interpolated maximal and minimal envelope
 % y - Residual of the orginal signal and the s
 % pks_max - Crest indices
 % pks_min - Trough indices
+% maxEnv - Envelope of maxima
+% minEnv - Envelope of minima
 
 pks_min = GetPks(-x);
 pks_max = GetPks(x);
@@ -22,5 +24,7 @@ varargout{1} = y;
 varargout{2} = (s1+s2)/2;
 varargout{3} = pks_max;
 varargout{4} = pks_min;
+varargout{5} = s2;
+varargout{6} = s1;
 end
 
