@@ -58,8 +58,9 @@ if ~isempty(pks)
         pks(abs(x(pks)) < peakThr)=[];
     end
     %# Pks by min distance
-    [~, inds] = sort(x(pks),'descend');
-    pks_sort = pks(inds);
+%     [~, inds] = sort(x(pks),'descend');
+%     pks_sort = pks(inds);
+    pks_sort = pks;
     dPks = diff(pks_sort);
     pks_sort(find(abs(dPks) < minPkDist)+1)=[];
     pks = unique(pks_sort);
@@ -69,9 +70,9 @@ end
 
 function crests = GetCrests(x)
 dx = diff(x);
+% gx = gradient(x);
 crests = find(dx(1:end-1)>0 & dx(2:end)<=0)+1;
-% crests    = find(diff(diff(x) > 0) < 0);
-% u    = find(x(crests+1) > x(crests));
-% crests(u) = crests(u)+1;
+% crests2 = find(dx(1:end-1)>=0 & dx(2:end)<0)+1;
+% crests = union(crests,crests2);
 
 end

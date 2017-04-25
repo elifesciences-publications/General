@@ -1,7 +1,7 @@
 function varargout = GetCubic(x)
-%GetCubic- Finds the maxima and minima in a signal, cubic interpolates
-%                    between each set of points and subtracts this from the
-%                    original signal
+%GetCubic- Finds the maxima and minima in a signal, spline (used to be cubic) 
+%          interpolates between each set of points and subtracts this from 
+%          the original signal
 % 
 % y = GetCubic(x);
 % [y,s,pks_max,pks_min, maxEnv, minEnv] = GetCubic(x);
@@ -16,8 +16,19 @@ function varargout = GetCubic(x)
 pks_min = GetPks(-x);
 pks_max = GetPks(x);
 x = x(:)';
-s1 = interp1([0 pks_min(:)' length(x)+1],[x(1) x(pks_min(:)) x(end)],1:length(x),'cubic');
-s2 = interp1([0 pks_max(:)' length(x)+1],[x(1) x(pks_max(:)) x(end)],1:length(x),'cubic');
+% s1 = interp1([0 pks_min(:)' length(x)+1],[x(1) x(pks_min(:)) x(end)],1:length(x),'cubic');
+% s2 = interp1([0 pks_max(:)' length(x)+1],[x(1) x(pks_max(:)) x(end)],1:length(x),'cubic');
+
+% ------ Somehow, if use this instead of the above lines, emd takes a much
+% -------much longer time.
+% s1 = interp1([0 pks_min(:)' length(x)+1],[mean(x) x(pks_min(:)) mean(x)],1:length(x),'cubic');
+% s2 = interp1([0 pks_max(:)' length(x)+1],[mean(x) x(pks_max(:)) mean(x)],1:length(x),'cubic');
+% -------------------------------------
+
+s1 = interp1([0 pks_min(:)' length(x)+1],[x(1) x(pks_min(:)) x(end)],1:length(x),'spline');
+s2 = interp1([0 pks_max(:)' length(x)+1],[x(1) x(pks_max(:)) x(end)],1:length(x),'spline');
+
+
 y = x - (s1+s2)/2;
 
 varargout{1} = y;
