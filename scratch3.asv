@@ -1,0 +1,17 @@
+
+%%
+% im = procData.IM_crop;
+% tc = procData.tailCurv;
+% or = FishOrientationFromTailCurves(tc);
+o
+%%
+
+figure
+for jj = 1:100
+    cla
+    imagesc(im(:,:,jj))
+    set(gca,'ydir','normal')
+    title(['Frame ' num2str(jj) ', Angle ' num2str(round(or(jj)))])
+    shg
+    pause()
+end
