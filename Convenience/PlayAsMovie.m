@@ -2,16 +2,25 @@ function PlayAsMovie(M, varargin)
 %PlayMatrixAsMovie Given a 3- or 4D matrix, plays images as movie with specified 
 % pause duration between images
 % PlayMovie(M);
-% PlayMovie(M,pauseDir)
+% PlayMovie(M,'pauseDur',pauseDur,'clrMap',clrMap)
 % 
 
 pauseDur = 0;
-if nargin >1
-    pauseDur = varargin{1};
+clrMap = gray;
+
+for jj = 1:numel(varargin)
+    if ischar(varargin{jj})
+        switch lower(varargin{jj})
+            case 'pausedur'
+                pauseDur =  varargin{jj+1};
+            case 'clrmap'
+                clrMap = varargin{jj+1};
+        end
+    end
 end
 
 fh = figure('Name','Movie');
-colormap(gray)
+colormap(clrMap)
 if ndims(M)==3
     for jj = 1:size(M,3)
         figure(fh)

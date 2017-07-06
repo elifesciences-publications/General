@@ -2,7 +2,7 @@
 function fileNames = GetFilenames(fileDir, varargin)
 % GetFilenames - Given the path to a directory and an optional search
 %   string, returns the names of files in the dir that have the seach
-%   string in them (case-insensitive)
+%   string in them (case-insensitive). Can also specify a file extension.
 % fileNames = GetFileNames(fileDir);
 % fileNames = GetFilenames(fileDir,'searchStr',searchStr,'ext',ext);
 % Inputs:
